@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#0d1520"/>
+  <!-- Border -->
+  <rect x="1" y="1" width="30" height="30" rx="6.5" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.5"/>
+  <!-- Corner accents -->
+  <line x1="1" y1="1" x2="7" y2="1" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="1" y1="1" x2="1" y2="7" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="31" y1="1" x2="25" y2="1" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="31" y1="1" x2="31" y2="7" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="1" y1="31" x2="7" y2="31" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="1" y1="31" x2="1" y2="25" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="31" y1="31" x2="25" y2="31" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="31" y1="31" x2="31" y2="25" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Diamond / PS icon -->
+  <rect x="11.5" y="11.5" width="9" height="9" rx="1.5" fill="none" stroke="#38bdf8" stroke-width="1.5" transform="rotate(45 16 16)" filter="url(#glow)"/>
+  <!-- Glow filter -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
