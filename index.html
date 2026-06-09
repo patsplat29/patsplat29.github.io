@@ -1,1 +1,685 @@
-!DOCTYPE html!
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PatSplat — Animator & Creator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1520;
+      --bg2: #111c2b;
+      --surface: #162030;
+      --border: rgba(56, 189, 248, 0.15);
+      --cyan: #38bdf8;
+      --purple: #818cf8;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --dim: #334155;
+      --font: 'Space Grotesk', sans-serif;
+      --mono: 'Share Tech Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 1rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      background: rgba(13, 21, 32, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan) 30%, var(--purple) 70%, transparent);
+      opacity: 0.5;
+    }
+
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-logo-icon {
+      width: 28px; height: 28px;
+      border: 1.5px solid rgba(56,189,248,0.5);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(56,189,248,0.07);
+    }
+
+    .nav-logo-icon::before {
+      content: '';
+      width: 9px; height: 9px;
+      border: 1.5px solid var(--cyan);
+      border-radius: 2px;
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px rgba(56,189,248,0.4);
+    }
+
+    .nav-logo span { color: var(--cyan); }
+
+    .nav-links {
+      display: flex; gap: 2px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 13px;
+      border-radius: 5px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(56,189,248,0.03) 0px, rgba(56,189,248,0.03) 1px, transparent 1px, transparent 80px),
+        repeating-linear-gradient(0deg, rgba(56,189,248,0.02) 0px, rgba(56,189,248,0.02) 1px, transparent 1px, transparent 80px);
+      pointer-events: none;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 20%; left: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 0.15em;
+      background: rgba(56,189,248,0.08);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 4px;
+      padding: 4px 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-tag::before { content: '▶  '; }
+
+    h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 .accent { color: var(--cyan); }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 10px 22px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #0d1520;
+    }
+
+    .btn-primary:hover {
+      background: #7dd3f8;
+      box-shadow: 0 0 18px rgba(56,189,248,0.35);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem; left: 2.5rem;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--cyan);
+      letter-spacing: 0.18em;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 em {
+      font-style: normal;
+      color: var(--cyan);
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      margin: 0 2.5rem;
+      max-width: calc(100% - 5rem);
+    }
+
+    /* ── ABOUT ── */
+    .about-body {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      max-width: 640px;
+    }
+
+    .about-body p + p { margin-top: 1rem; }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--cyan);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── PROJECTS ── */
+    .projects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem 2rem;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .project-card:hover {
+      border-color: rgba(56,189,248,0.4);
+      transform: translateY(-2px);
+    }
+
+    .project-card::after {
+      content: '↗';
+      position: absolute;
+      top: 1.5rem; right: 1.75rem;
+      color: var(--dim);
+      font-size: 1rem;
+      transition: color 0.15s;
+    }
+
+    .project-card:hover::after { color: var(--cyan); }
+
+    .project-type {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--purple);
+      letter-spacing: 0.14em;
+      margin-bottom: 0.6rem;
+    }
+
+    .project-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--dim);
+      border-radius: 3px;
+      padding: 3px 8px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── SKILLS ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+
+    .skill-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .skill-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .skill-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── CONTACT ── */
+    .contact-body {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .contact-link:hover {
+      border-color: rgba(56,189,248,0.4);
+      color: var(--cyan);
+    }
+
+    .contact-link-icon {
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 0.06em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--cyan); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1.25rem; }
+      #hero { padding: 0 1.25rem; }
+      section { padding: 4rem 1.25rem; }
+      .divider { margin: 0 1.25rem; max-width: calc(100% - 2.5rem); }
+      footer { padding: 1.5rem 1.25rem; }
+      .nav-links { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo">
+      <div class="nav-logo-icon"></div>
+      Pat<span>Splat</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-tag">Animator &amp; Flash Creator</div>
+    <h1>Hey, I'm<br><span class="accent">PatSplat</span></h1>
+    <p class="hero-sub">
+      Animator, Flash game maker, and creator of Object Oddballs.
+      I've been bringing characters to life for almost a year — and I'm just getting started.
+    </p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">See my work ↓</a>
+      <a href="#contact" class="btn btn-ghost">Get in touch</a>
+    </div>
+    <div class="scroll-hint">scroll to explore</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label">01 — About</div>
+    <h2>Animator by passion,<br><em>creator by choice.</em></h2>
+    <div class="about-body">
+      <p>
+        I've been animating for almost a year now and have been throwing everything into it.
+        Whether it's frame-by-frame characters, object show episodes, or weird little Flash games —
+        if it moves and makes people smile, I want to make it.
+      </p>
+      <p>
+        I have a deep love for the Flash animation era and work to keep that style alive
+        through my own games and animations. My object show, Object Oddballs, is where I
+        get to push my storytelling and character design the furthest.
+      </p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-val">~1yr</span>
+        <span class="stat-label">Animating</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">OO</span>
+        <span class="stat-label">Object Oddballs</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">Flash</span>
+        <span class="stat-label">Style</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">∞</span>
+        <span class="stat-label">Ideas left</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label">02 — Projects</div>
+    <h2>Things I've <em>built &amp; made.</em></h2>
+    <div class="projects-grid">
+
+      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="project-card">
+        <div class="project-type">Object Show — Ongoing</div>
+        <div class="project-title">Object Oddballs</div>
+        <div class="project-desc">
+          An original object show I write, animate, and produce. Follows a cast of oddball characters
+          competing, clashing, and causing chaos — with all the personality that Flash-style
+          animation brings.
+        </div>
+        <div class="project-tags">
+          <span class="tag">Animation</span>
+          <span class="tag">Object Show</span>
+          <span class="tag">YouTube</span>
+        </div>
+      </a>
+
+      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener" class="project-card">
+        <div class="project-type">Flash Games &amp; Animations</div>
+        <div class="project-title">Flash Dojo Projects</div>
+        <div class="project-desc">
+          A collection of Flash-style games and animations I've made and published on Flash Dojo.
+          Keeping the classic web animation spirit alive one frame at a time.
+        </div>
+        <div class="project-tags">
+          <span class="tag">Flash</span>
+          <span class="tag">Games</span>
+          <span class="tag">Animation</span>
+          <span class="tag">Flash Dojo</span>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="project-card">
+        <div class="project-type">YouTube Channel</div>
+        <div class="project-title">PatSplat on YouTube</div>
+        <div class="project-desc">
+          My main home for animations, object show episodes, and whatever else I feel like making.
+          Subscribe to follow along as I grow.
+        </div>
+        <div class="project-tags">
+          <span class="tag">YouTube</span>
+          <span class="tag">Animation</span>
+          <span class="tag">Videos</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label">03 — Skills</div>
+    <h2>What I <em>work with.</em></h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🎬</div>
+        <div class="skill-name">Animation</div>
+        <div class="skill-desc">Frame-by-frame and Flash-style animation — character movement, timing, and expression.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⚡</div>
+        <div class="skill-name">Flash Style</div>
+        <div class="skill-desc">Keeping the classic Flash animation aesthetic alive with modern tools and workflows.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🎮</div>
+        <div class="skill-name">Flash Games</div>
+        <div class="skill-desc">Building interactive Flash-style games with simple mechanics and fun characters.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">✏️</div>
+        <div class="skill-name">Character Design</div>
+        <div class="skill-desc">Designing expressive object show characters with distinct personalities and looks.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📖</div>
+        <div class="skill-name">Storytelling</div>
+        <div class="skill-desc">Writing episodes, plotting character arcs, and building a world for Object Oddballs.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🎞️</div>
+        <div class="skill-name">Video Production</div>
+        <div class="skill-desc">Editing, exporting, and publishing finished animations to YouTube and beyond.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label">04 — Contact</div>
+    <h2>Let's make<br><em>something.</em></h2>
+    <p class="contact-body">
+      Want to collab on an animation, an object show, or a Flash project?
+      Always open to connecting with other creators.
+    </p>
+    <div class="contact-links">
+      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="contact-link">
+        <span class="contact-link-icon">▶</span>
+        YouTube — @PatSplat29
+      </a>
+      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener" class="contact-link">
+        <span class="contact-link-icon">⚡</span>
+        Flash Dojo — PatSplat29
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">© 2026 PatSplat</div>
+    <div class="footer-links">
+      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener">Flash Dojo</a>
+    </div>
+  </footer>
+
+</body>
+</html>
