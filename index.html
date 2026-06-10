@@ -496,6 +496,7 @@
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
+      <li><a href="#games">Games</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -522,7 +523,7 @@
   <!-- ABOUT -->
   <section id="about">
     <div class="section-label">01 — About</div>
-    <h2><br><em></em></h2>
+    <h2>Just here to make <em>cool stuff.</em></h2>
     <div class="about-body">
       <p>
         I've been animating for almost a year now and have been throwing everything into it.
@@ -611,9 +612,47 @@
 
   <div class="divider"></div>
 
+  <div class="divider"></div>
+
+  <!-- GAMES -->
+  <section id="games">
+    <div class="section-label">03 — Games</div>
+    <h2>Games I've <em>made.</em></h2>
+    <p style="color:var(--muted); font-size:1.05rem; line-height:1.8; max-width:600px; margin-bottom:2.5rem;">
+      Flash-style games built and playable right here in your browser, powered by Ruffle.
+    </p>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.75rem 2rem; margin-bottom:1.25rem;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--purple); letter-spacing:0.14em; margin-bottom:0.6rem;">Flash Game</div>
+      <div style="font-size:1.1rem; font-weight:600; margin-bottom:1.25rem;">FaceWars</div>
+      <div style="background:#000; border-radius:8px; overflow:hidden; display:inline-block; border:1px solid var(--border);">
+        <canvas id="facewars-canvas" style="display:block;"></canvas>
+      </div>
+      <p style="color:var(--muted); font-size:0.85rem; margin-top:1rem;">
+        If the game doesn't load, make sure <code style="font-family:var(--mono); color:var(--cyan); background:rgba(56,189,248,0.08); padding:1px 5px; border-radius:3px;">FaceWars.swf</code> is in the same folder as this page.
+      </p>
+    </div>
+  </section>
+
+  <!-- Ruffle -->
+  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+  <script>
+    window.addEventListener("load", () => {
+      const ruffle = window.RufflePlayer.newest();
+      const player = ruffle.createPlayer();
+      player.style.width = "550px";
+      player.style.height = "400px";
+      const container = document.getElementById("facewars-canvas");
+      container.replaceWith(player);
+      player.load("FaceWars.swf");
+    });
+  </script>
+
+  <div class="divider"></div>
+
   <!-- SKILLS -->
   <section id="skills">
-    <div class="section-label">03 — Skills</div>
+    <div class="section-label">04 — Skills</div>
     <h2>What I <em>work with.</em></h2>
     <div class="skills-grid">
       <div class="skill-card">
@@ -648,7 +687,7 @@
 
   <!-- CONTACT -->
   <section id="contact">
-    <div class="section-label">04 — Contact</div>
+    <div class="section-label">05 — Contact</div>
     <h2>Let's make<br><em>something.</em></h2>
     <p class="contact-body">
       Want to collab on an animation, an object show, or a Flash project?
