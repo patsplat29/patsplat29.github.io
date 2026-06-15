@@ -1,825 +1,276 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PatSplat — Animator & Creator</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0d1520;
-      --bg2: #111c2b;
-      --surface: #162030;
-      --border: rgba(56, 189, 248, 0.15);
-      --cyan: #38bdf8;
-      --purple: #818cf8;
-      --text: #e2e8f0;
-      --muted: #64748b;
-      --dim: #334155;
-      --font: 'Space Grotesk', sans-serif;
-      --mono: 'Share Tech Mono', monospace;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 1rem;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2.5rem;
-      background: rgba(13, 21, 32, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    nav::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cyan) 30%, var(--purple) 70%, transparent);
-      opacity: 0.5;
-    }
-
-    .nav-logo {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav-logo-icon {
-      width: 28px; height: 28px;
-      border: 1.5px solid rgba(56,189,248,0.5);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(56,189,248,0.07);
-    }
-
-    .nav-logo-icon::before {
-      content: '';
-      width: 9px; height: 9px;
-      border: 1.5px solid var(--cyan);
-      border-radius: 2px;
-      transform: rotate(45deg);
-      box-shadow: 0 0 6px rgba(56,189,248,0.4);
-    }
-
-    .nav-links {
-      display: flex; gap: 2px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 13px;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 5px 13px;
-      border-radius: 5px;
-      transition: color 0.15s, background 0.15s;
-    }
-
-    .nav-links a:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* ── HERO ── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 0 2.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(90deg, rgba(56,189,248,0.03) 0px, rgba(56,189,248,0.03) 1px, transparent 1px, transparent 80px),
-        repeating-linear-gradient(0deg, rgba(56,189,248,0.02) 0px, rgba(56,189,248,0.02) 1px, transparent 1px, transparent 80px);
-      pointer-events: none;
-    }
-
-    .hero-glow {
-      position: absolute;
-      top: 20%; left: -10%;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-tag {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--cyan);
-      letter-spacing: 0.15em;
-      background: rgba(56,189,248,0.08);
-      border: 1px solid rgba(56,189,248,0.2);
-      border-radius: 4px;
-      padding: 4px 10px;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-tag::before { content: '▶  '; }
-
-    h1 {
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      margin-bottom: 1.25rem;
-    }
-
-    h1 .accent { color: var(--cyan); }
-
-    .hero-sub {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 480px;
-      margin-bottom: 2rem;
-      line-height: 1.7;
-    }
-
-    .hero-btns {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      padding: 10px 22px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: all 0.15s;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--cyan);
-      color: #0d1520;
-    }
-
-    .btn-primary:hover {
-      background: #7dd3f8;
-      box-shadow: 0 0 18px rgba(56,189,248,0.35);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--cyan);
-      color: var(--cyan);
-    }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 2rem; left: 2.5rem;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--dim);
-      letter-spacing: 0.12em;
-    }
-
-    /* ── SECTIONS ── */
-    section {
-      padding: 6rem 2.5rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--cyan);
-      letter-spacing: 0.18em;
-      margin-bottom: 0.75rem;
-    }
-
-    h2 {
-      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-      margin-bottom: 1.5rem;
-    }
-
-    h2 em {
-      font-style: normal;
-      color: var(--cyan);
-    }
-
-    .divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, var(--border), transparent);
-      margin: 0 2.5rem;
-      max-width: calc(100% - 5rem);
-    }
-
-    /* ── ABOUT ── */
-    .about-body {
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.8;
-      max-width: 640px;
-    }
-
-    .about-body p + p { margin-top: 1rem; }
-
-    .stats {
-      display: flex;
-      gap: 2rem;
-      margin-top: 2.5rem;
-      flex-wrap: wrap;
-    }
-
-    .stat { display: flex; flex-direction: column; gap: 2px; }
-
-    .stat-val {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--cyan);
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--dim);
-      letter-spacing: 0.12em;
-    }
-
-    /* ── PROJECTS ── */
-    .projects-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      margin-top: 0.5rem;
-    }
-
-    .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.75rem 2rem;
-      position: relative;
-      transition: border-color 0.2s, transform 0.2s;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    .project-card:hover {
-      border-color: rgba(56,189,248,0.4);
-      transform: translateY(-2px);
-    }
-
-    .project-card::after {
-      content: '↗';
-      position: absolute;
-      top: 1.5rem; right: 1.75rem;
-      color: var(--dim);
-      font-size: 1rem;
-      transition: color 0.15s;
-    }
-
-    .project-card:hover::after { color: var(--cyan); }
-
-    .project-type {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: var(--purple);
-      letter-spacing: 0.14em;
-      margin-bottom: 0.6rem;
-    }
-
-    .project-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .project-desc {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 560px;
-    }
-
-    .project-tags {
-      display: flex;
-      gap: 8px;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: var(--muted);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--dim);
-      border-radius: 3px;
-      padding: 3px 8px;
-      letter-spacing: 0.08em;
-    }
-
-    /* ── SKILLS ── */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .skill-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-    }
-
-    .skill-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-
-    .skill-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    /* ── CONTACT ── */
-    .contact-body {
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .contact-links {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .contact-link {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text);
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 1rem 1.25rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .contact-link:hover {
-      border-color: rgba(56,189,248,0.4);
-      color: var(--cyan);
-    }
-
-    .contact-link-icon {
-      font-size: 1.1rem;
-      width: 24px;
-      text-align: center;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-copy {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--dim);
-      letter-spacing: 0.06em;
-    }
-
-    .footer-links { display: flex; gap: 1.5rem; }
-
-    .footer-links a {
-      font-size: 13px;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-
-    .footer-links a:hover { color: var(--cyan); }
-
-    /* ── THEME PICKER ── */
-    .theme-btn {
-      position: fixed;
-      bottom: 1.5rem; right: 1.5rem;
-      z-index: 200;
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-      transition: border-color 0.15s, transform 0.15s;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-
-    .theme-btn:hover {
-      border-color: var(--cyan);
-      transform: scale(1.1);
-    }
-
-    .theme-panel {
-      position: fixed;
-      bottom: 5rem; right: 1.5rem;
-      z-index: 200;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      display: none;
-      flex-direction: column;
-      gap: 0.4rem;
-      width: 165px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-
-    .theme-panel.open { display: flex; }
-
-    .theme-panel-label {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 0.12em;
-      margin-bottom: 0.25rem;
-    }
-
-    .theme-swatch {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      font-size: 12px;
-      color: var(--text);
-      transition: background 0.12s;
-    }
-
-    .theme-swatch:hover { background: rgba(255,255,255,0.06); }
-    .theme-swatch.active { border-color: var(--cyan); }
-
-    .swatch-dot {
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 600px) {
-      nav { padding: 0 1.25rem; }
-      #hero { padding: 0 1.25rem; }
-      section { padding: 4rem 1.25rem; }
-      .divider { margin: 0 1.25rem; max-width: calc(100% - 2.5rem); }
-      footer { padding: 1.5rem 1.25rem; }
-      .nav-links { display: none; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
-    }
-  </style>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tahoma&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #e8a000;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 11px;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  .ng-topbar {
+    background: linear-gradient(180deg, #cc7700 0%, #aa5500 40%, #883300 100%);
+    border-bottom: 3px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    height: 48px;
+  }
+  .ng-logo { font-family: Impact, 'Arial Black', sans-serif; font-size: 32px; color: #fff; text-shadow: 2px 2px 0 #000; letter-spacing: -1px; }
+  .ng-logo span { color: #ffcc00; }
+  .ng-tagline { font-size: 9px; color: #ffcc88; font-style: italic; }
+
+  .ng-nav { background: linear-gradient(180deg, #333 0%, #111 100%); border-bottom: 2px solid #ffaa00; display: flex; height: 28px; }
+  .ng-nav a { display: flex; align-items: center; padding: 0 12px; color: #ffcc88; text-decoration: none; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-right: 1px solid #444; height: 100%; }
+  .ng-nav a:first-child { border-left: 1px solid #444; }
+  .ng-nav a:hover, .ng-nav a.active { background: #ffaa00; color: #000; }
+
+  .ng-body { max-width: 980px; margin: 0 auto; padding: 8px; display: grid; grid-template-columns: 1fr 210px; gap: 8px; }
+
+  .ng-panel { background: #fff; border: 1px solid #996600; margin-bottom: 8px; overflow: hidden; }
+  .ng-panel-header { background: linear-gradient(180deg, #ffcc00 0%, #cc8800 100%); border-bottom: 2px solid #664400; padding: 4px 8px; display: flex; align-items: center; justify-content: space-between; }
+  .ng-panel-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 14px; color: #000; letter-spacing: 0.5px; }
+  .ng-panel-body { padding: 10px; }
+
+  .featured-wrap { display: flex; gap: 12px; }
+  .featured-thumb { width: 160px; height: 120px; background: linear-gradient(135deg, #1a1a2e, #16213e); border: 2px solid #664400; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; }
+  .featured-thumb-label { position: absolute; bottom:0; left:0; right:0; background: rgba(0,0,0,0.75); color: #ffcc00; font-size: 8px; font-weight: bold; text-align: center; padding: 2px 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .featured-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 20px; color: #cc4400; line-height: 1.1; margin-bottom: 4px; }
+  .featured-meta { font-size: 10px; color: #666; margin-bottom: 6px; }
+  .featured-meta a { color: #cc6600; font-weight: bold; text-decoration: none; }
+  .featured-meta a:hover { text-decoration: underline; }
+  .featured-desc { font-size: 11px; color: #333; line-height: 1.6; margin-bottom: 8px; }
+
+  .sub-item { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid #e8c060; align-items: flex-start; }
+  .sub-item:last-child { border-bottom: none; }
+  .sub-thumb { width: 52px; height: 40px; border: 1px solid #664400; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .sub-title { color: #0033aa; font-weight: bold; font-size: 11px; text-decoration: none; display: block; margin-bottom: 2px; }
+  .sub-title:hover { color: #cc4400; text-decoration: underline; }
+  .sub-meta { font-size: 9px; color: #888; }
+  .badge { display: inline-block; font-size: 8px; font-weight: bold; padding: 1px 4px; text-transform: uppercase; margin-right: 3px; }
+  .b-anim { background: #003399; color: #fff; }
+  .b-game { background: #006633; color: #fff; }
+
+  .ng-hr { height: 1px; background: linear-gradient(90deg, transparent, #cc8800, transparent); border: none; margin: 4px 0; }
+
+  .ng-sidebar { display: flex; flex-direction: column; gap: 8px; }
+  .ng-side-panel { background: #fff; border: 1px solid #996600; overflow: hidden; }
+  .ng-side-header { background: linear-gradient(180deg, #ff6600 0%, #cc3300 100%); border-bottom: 2px solid #661100; padding: 3px 8px; }
+  .ng-side-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 13px; color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
+  .ng-side-body { padding: 7px; }
+
+  .user-card { display: flex; flex-direction: column; align-items: center; padding: 8px 6px; text-align: center; }
+  .user-icon { width: 64px; height: 64px; background: linear-gradient(135deg, #ffaa00, #cc5500); border: 3px solid #664400; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 6px; }
+  .user-name { font-family: Impact, sans-serif; font-size: 17px; color: #cc4400; margin-bottom: 4px; }
+  .user-stats { width: 100%; font-size: 10px; text-align: left; }
+  .user-stats td:first-child { color: #888; padding-right: 6px; }
+  .user-stats td:last-child { font-weight: bold; }
+
+  .contact-btn { display: block; background: linear-gradient(180deg, #cc2200, #881100); color: #fff; text-decoration: none; padding: 6px 8px; font-size: 10px; font-weight: bold; text-align: center; border: 1px outset #ff4400; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+  .contact-btn:hover { filter: brightness(1.2); }
+  .contact-btn.gold { background: linear-gradient(180deg, #cc6600, #884400); border-color: #ff8800; }
+
+  .ng-footer { max-width: 980px; margin: 4px auto 0; background: #000; border-top: 3px solid #cc6600; padding: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .ng-footer a { color: #cc7700; font-size: 10px; text-decoration: none; margin-right: 12px; }
+  .ng-footer a:hover { color: #ffaa00; text-decoration: underline; }
+  .ng-footer-copy { font-size: 9px; color: #555; }
+
+  /* SWF PLAYER */
+  .swf-wrap {
+    background: #000;
+    border: 2px solid #664400;
+    display: inline-block;
+    line-height: 0;
+  }
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#hero" class="nav-logo">
-      <div class="nav-logo-icon"></div>
-      PatSplat
-    </a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#games">Games</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
+<div class="ng-topbar">
+  <div>
+    <div class="ng-logo">Pat<span>Splat</span></div>
+    <div class="ng-tagline">Animator · Flash Creator · Object Show Author</div>
+  </div>
+</div>
 
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-tag">Animator &amp; Flash Creator</div>
-    <h1>Hey, I'm<br><span class="accent">PatSplat</span></h1>
-    <p class="hero-sub">
-      Animator, Flash game maker, and creator of Object Oddballs.
-      I've been bringing characters to life for almost a year — and I'm just getting started.
-    </p>
-    <div class="hero-btns">
-      <a href="#projects" class="btn btn-primary">See my work ↓</a>
-      <a href="#contact" class="btn btn-ghost">Get in touch</a>
-    </div>
-    <div class="scroll-hint">scroll to explore</div>
-  </section>
+<div class="ng-nav">
+  <a href="#" class="active">Home</a>
+  <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube</a>
+  <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</div>
 
-  <div class="divider"></div>
+<div class="ng-body">
 
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="section-label">01 — About</div>
-    <h2>Just here to make <em>cool stuff.</em></h2>
-    <div class="about-body">
-      <p>
-        I've been animating for almost a year now and have been throwing everything into it.
-        Whether it's frame-by-frame characters, object show episodes, or weird little Flash games —
-        if it moves and makes people smile, I want to make it.
-      </p>
-      <p>
-        I have a deep love for the Flash animation era and work to keep that style alive
-        through my own games and animations. My object show, Object Oddballs, is where I
-        get to push my storytelling and character design the furthest.
-      </p>
-    </div>
-    <div class="stats">
-      <div class="stat">
-        <span class="stat-val">~1yr</span>
-        <span class="stat-label">Animating</span>
+  <div>
+
+    <!-- LATEST EPISODE -->
+    <div class="ng-panel">
+      <div class="ng-panel-header">
+        <div class="ng-panel-title">🌿 LATEST — OO 4: Minty Greeny</div>
+        <div style="font-size:9px; color:#664400;">Newest Episode · Object Oddballs</div>
       </div>
-      <div class="stat">
-        <span class="stat-val">OO</span>
-        <span class="stat-label">Object Oddballs</span>
-      </div>
-      <div class="stat">
-        <span class="stat-val">Flash</span>
-        <span class="stat-label">Style</span>
-      </div>
-      <div class="stat">
-        <span class="stat-val">∞</span>
-        <span class="stat-label">Ideas left</span>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- PROJECTS -->
-  <section id="projects">
-    <div class="section-label">02 — Projects</div>
-    <h2>Things I've <em>built &amp; made.</em></h2>
-    <div class="projects-grid">
-
-      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="project-card">
-        <div class="project-type">Object Show — Ongoing</div>
-        <div class="project-title">Object Oddballs</div>
-        <div class="project-desc">
-          An original object show I write, animate, and produce. Follows a cast of 11 characters fighting for victory over one another!
-          This show follows characters like Donut Hole, Baseball, Candy Corn, and more!
+      <div class="ng-panel-body">
+        <div style="margin-bottom:8px;">
+          <div style="font-family:Impact,sans-serif; font-size:18px; color:#cc4400; margin-bottom:4px;">OO 4: Minty Greeny</div>
+          <div style="font-size:10px; color:#666; margin-bottom:10px;">
+            By <a href="https://www.youtube.com/@PatSplat29" target="_blank" style="color:#cc6600; font-weight:bold; text-decoration:none;">PatSplat29</a>
+            &nbsp;·&nbsp; Episode 4 of Object Oddballs
+          </div>
         </div>
-        <div class="project-tags">
-          <span class="tag">Animation</span>
-          <span class="tag">Object Show</span>
-          <span class="tag">YouTube</span>
+        <div class="swf-wrap">
+          <div id="swf-player-ep4"></div>
         </div>
-      </a>
+      </div>
+    </div>
 
-      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener" class="project-card">
-        <div class="project-type">Flash Games &amp; Animations</div>
-        <div class="project-title">Flash Dojo Projects</div>
-        <div class="project-desc">
-          A collection of Flash-style games and animations I've made and published on FlashDojo.
-          Keeping the classic web animation spirit alive one frame at a time.
+    <!-- ALL SUBMISSIONS -->
+    <div class="ng-panel">
+      <div class="ng-panel-header">
+        <div class="ng-panel-title">📁 My Work</div>
+      </div>
+      <div class="ng-panel-body">
+
+        <div class="sub-item">
+          <div class="sub-thumb" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);">🍩</div>
+          <div style="flex:1;">
+            <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="sub-title">Object Oddballs — Full Series</a>
+            <div class="sub-meta"><span class="badge b-anim">ANIMATION</span> YouTube · @PatSplat29</div>
+            <div class="sub-meta" style="margin-top:3px; color:#555;">11 characters, original story, hand-animated in Adobe Animate. Ongoing series.</div>
+          </div>
         </div>
-        <div class="project-tags">
-          <span class="tag">Flash</span>
-          <span class="tag">Games</span>
-          <span class="tag">Animation</span>
-          <span class="tag">Flash Dojo</span>
+
+        <div class="sub-item">
+          <div class="sub-thumb" style="background:linear-gradient(135deg,#003300,#006633);">🎮</div>
+          <div style="flex:1;">
+            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="sub-title">FaceWars — Flash Game</a>
+            <div class="sub-meta"><span class="badge b-game">GAME</span> FlashDojo · PatSplat29</div>
+            <div class="sub-meta" style="margin-top:3px; color:#555;">Press Space to attack. Dodge the purple dudes. 3 lives — make them count!</div>
+          </div>
         </div>
-      </a>
 
-      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="project-card">
-        <div class="project-type">YouTube Channel</div>
-        <div class="project-title">PatSplat on YouTube</div>
-        <div class="project-desc">
-          My main home for animations, object show episodes, and whatever else I feel like making.
-          Subscribe to follow along as I grow.
+        <div class="sub-item">
+          <div class="sub-thumb" style="background:linear-gradient(135deg,#220044,#440088);">⚡</div>
+          <div style="flex:1;">
+            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="sub-title">More Flash Stuff — FlashDojo</a>
+            <div class="sub-meta"><span class="badge" style="background:#884400;color:#fff;">FLASH</span> FlashDojo · PatSplat29</div>
+            <div class="sub-meta" style="margin-top:3px; color:#555;">Collection of Flash-style games and animations. Keeping the classic web animation spirit alive.</div>
+          </div>
         </div>
-        <div class="project-tags">
-          <span class="tag">YouTube</span>
-          <span class="tag">Animation</span>
-          <span class="tag">Videos</span>
+
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="ng-panel" id="about">
+      <div class="ng-panel-header"><div class="ng-panel-title">📰 About Me</div></div>
+      <div class="ng-panel-body" style="line-height:1.7; color:#333; font-size:11px;">
+        <p style="margin-bottom:8px;">
+          I've been animating for almost a year and have been throwing everything into it.
+          Whether it's frame-by-frame characters, object show episodes, or Flash games —
+          if it moves and makes people smile, I want to make it.
+        </p>
+        <p>
+          I have a deep love for the Flash animation era and work to keep that style alive
+          through my own games and animations. Object Oddballs is where I get to push
+          my storytelling and character design the furthest.
+        </p>
+        <hr class="ng-hr" style="margin:10px 0;">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; font-size:10px;">
+          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">~1 yr</div><div style="color:#888;">Animating</div></div>
+          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">11</div><div style="color:#888;">OO Characters</div></div>
+          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">Flash</div><div style="color:#888;">Style</div></div>
         </div>
-      </a>
-
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- GAMES -->
-  <section id="games">
-    <div class="section-label">03 — Games</div>
-    <h2>Games I've <em>made.</em></h2>
-    <p style="color:var(--muted); font-size:1.05rem; line-height:1.8; max-width:600px; margin-bottom:2.5rem;">
-      Flash-style games built and playable right here in your browser, powered by Ruffle.
-    </p>
-
-    <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.75rem 2rem; margin-bottom:1.25rem;">
-      <div style="font-family:var(--mono); font-size:9px; color:var(--purple); letter-spacing:0.14em; margin-bottom:0.6rem;">Flash Game</div>
-      <div style="font-size:1.1rem; font-weight:600; margin-bottom:1.25rem;">FaceWars</div>
-      <div style="background:#000; border-radius:8px; overflow:hidden; display:inline-block; border:1px solid var(--border);">
-        <canvas id="facewars-canvas" style="display:block;"></canvas>
-      </div>
-      <p style="color:var(--muted); font-size:0.85rem; margin-top:1rem;">
-        <strong>How To Play:</strong>
-        <ol style="margin-top:0.5rem; padding-left:1.25rem; color:var(--muted); font-size:0.85rem; line-height:1.8;">
-          <li>Press Space To Attack</li>
-          <li>Try to shoot the purple dudes</li>
-          <li>You have 3 lives! Try not to get hit by the purple dudes and make your 3 lives count!</li>
-        </ol>
-        <strong style="display:block; margin-top:0.75rem;">To restart, refresh the page!</strong>
-      </p>
-    </div>
-  </section>
-
-  <!-- Ruffle -->
-  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-  <script>
-    window.addEventListener("load", () => {
-      const ruffle = window.RufflePlayer.newest();
-      const player = ruffle.createPlayer();
-      player.style.width = "550px";
-      player.style.height = "400px";
-      const container = document.getElementById("facewars-canvas");
-      container.replaceWith(player);
-      player.load("FaceWars.swf");
-    });
-  </script>
-
-  <div class="divider"></div>
-
-  <!-- SKILLS -->
-  <section id="skills">
-    <div class="section-label">04 — Skills</div>
-    <h2>What I <em>work with.</em></h2>
-    <div class="skills-grid">
-      <div class="skill-card">
-        <div class="skill-name">Animation</div>
-        <div class="skill-desc">Frame-by-frame and Flash-style animation — character movement, timing, and expression. I use a mix of software.
-        An example of software I mainly use is Adobe Animate 2022. I also use a Wacom Intuos drawing tablet!</div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-name">Flash Style</div>
-        <div class="skill-desc">Keeping the classic Flash animation aesthetic alive with modern tools and workflows.</div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-name">Flash Games</div>
-        <div class="skill-desc">Building interactive Flash-style games with simple mechanics and fun characters.</div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-name">Character Design</div>
-        <div class="skill-desc">Designing expressive object show characters with distinct personalities and looks.</div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-name">Storytelling</div>
-        <div class="skill-desc">Writing episodes, plotting character arcs, and building a world for Object Oddballs.</div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-name">Video Production</div>
-        <div class="skill-desc">Editing, exporting, and publishing finished animations to YouTube and beyond.</div>
       </div>
     </div>
-  </section>
 
-  <div class="divider"></div>
+    <!-- SKILLS -->
+    <div class="ng-panel">
+      <div class="ng-panel-header"><div class="ng-panel-title">⚡ Skills &amp; Tools</div></div>
+      <div class="ng-panel-body" style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Animation (frame-by-frame, Flash style)</span><span style="color:#cc4400; font-weight:bold;">Adobe Animate 2022</span></div>
+        <hr class="ng-hr">
+        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Drawing Tablet</span><span style="color:#cc4400; font-weight:bold;">Wacom Intuos</span></div>
+        <hr class="ng-hr">
+        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Flash Games</span><span style="color:#cc4400; font-weight:bold;">FlashDojo</span></div>
+        <hr class="ng-hr">
+        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Character Design &amp; Storytelling</span><span style="color:#cc4400; font-weight:bold;">Object Oddballs</span></div>
+        <hr class="ng-hr">
+        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Video Production &amp; Publishing</span><span style="color:#cc4400; font-weight:bold;">YouTube</span></div>
+      </div>
+    </div>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="section-label">05 — Contact</div>
-    <h2>Let's make<br><em>something.</em></h2>
-    <p class="contact-body">
-      Want to collab on an animation, an object show, or a Flash project?
-      Always open to connecting with other creators.
-    </p>
-    <div class="contact-links">
-      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener" class="contact-link">
-        <span class="contact-link-icon">▶</span>
-        YouTube — @PatSplat29
-      </a>
-      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener" class="contact-link">
-        <span class="contact-link-icon">⚡</span>
-        Flash Dojo — PatSplat29
-      </a>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-copy">© 2026 PatSplat</div>
-    <div class="footer-links">
-      <a href="https://www.youtube.com/@PatSplat29" target="_blank" rel="noopener">YouTube</a>
-      <a href="https://flashdojo.com/user/PatSplat29" target="_blank" rel="noopener">FlashDojo</a>
-    </div>
-  </footer>
-
-  <!-- THEME PICKER -->
-  <button class="theme-btn" id="themeBtn" title="Change theme">🎨</button>
-  <div class="theme-panel" id="themePanel">
-    <div class="theme-panel-label">ACCENT COLOR</div>
-    <div class="theme-swatch active" data-color="#38bdf8" data-name="Cyan">
-      <div class="swatch-dot" style="background:#38bdf8;"></div> Cyan
-    </div>
-    <div class="theme-swatch" data-color="#a78bfa" data-name="Purple">
-      <div class="swatch-dot" style="background:#a78bfa;"></div> Purple
-    </div>
-    <div class="theme-swatch" data-color="#34d399" data-name="Green">
-      <div class="swatch-dot" style="background:#34d399;"></div> Green
-    </div>
-    <div class="theme-swatch" data-color="#fb923c" data-name="Orange">
-      <div class="swatch-dot" style="background:#fb923c;"></div> Orange
-    </div>
-    <div class="theme-swatch" data-color="#f472b6" data-name="Pink">
-      <div class="swatch-dot" style="background:#f472b6;"></div> Pink
-    </div>
-    <div class="theme-swatch" data-color="#facc15" data-name="Yellow">
-      <div class="swatch-dot" style="background:#facc15;"></div> Yellow
-    </div>
-    <div class="theme-swatch" data-color="#f87171" data-name="Red">
-      <div class="swatch-dot" style="background:#f87171;"></div> Red
-    </div>
   </div>
 
-  <script>
-    const btn = document.getElementById('themeBtn');
-    const panel = document.getElementById('themePanel');
-    const root = document.documentElement;
+  <!-- SIDEBAR -->
+  <div class="ng-sidebar">
 
-    btn.addEventListener('click', () => panel.classList.toggle('open'));
-    document.addEventListener('click', e => {
-      if (!btn.contains(e.target) && !panel.contains(e.target)) panel.classList.remove('open');
-    });
+    <div class="ng-side-panel">
+      <div class="ng-side-header"><div class="ng-side-title">👤 PatSplat29</div></div>
+      <div class="user-card">
+        <div class="user-icon">🎨</div>
+        <div class="user-name">PatSplat29</div>
+        <div style="font-size:9px; color:#888; margin-bottom:8px;">Animator &amp; Flash Creator</div>
+        <table class="user-stats">
+          <tr><td>Animating:</td><td>~1 Year</td></tr>
+          <tr><td>Main Show:</td><td>Object Oddballs</td></tr>
+          <tr><td>Style:</td><td>Flash</td></tr>
+          <tr><td>Tool:</td><td>Animate 2022</td></tr>
+          <tr><td>Tablet:</td><td>Wacom Intuos</td></tr>
+        </table>
+      </div>
+    </div>
 
-    document.querySelectorAll('.theme-swatch').forEach(swatch => {
-      swatch.addEventListener('click', () => {
-        const color = swatch.dataset.color;
-        root.style.setProperty('--cyan', color);
-        // Update border opacity to match new color
-        root.style.setProperty('--border', color.replace('#', 'rgba(') + ', 0.15)');
-        document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
-        swatch.classList.add('active');
-      });
-    });
-  </script>
+    <div class="ng-side-panel" id="contact">
+      <div class="ng-side-header"><div class="ng-side-title">✉ Contact</div></div>
+      <div class="ng-side-body" style="font-size:10px; color:#555; margin-bottom:6px; line-height:1.5;">
+        Want to collab on an animation or object show? Find me here:
+      </div>
+      <div class="ng-side-body" style="padding-top:0;">
+        <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="contact-btn">▶ YouTube — @PatSplat29</a>
+        <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="contact-btn gold">⚡ FlashDojo — PatSplat29</a>
+      </div>
+    </div>
 
+    <div class="ng-side-panel">
+      <div class="ng-side-header"><div class="ng-side-title">🍩 Object Oddballs Cast</div></div>
+      <div class="ng-side-body" style="font-size:10px; color:#333; line-height:1.9;">
+        🍩 Donut Hole<br>
+        ⚾ Baseball<br>
+        🍬 Candy Corn<br>
+        <span style="color:#888; font-size:9px;">+ 8 more characters...</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="ng-footer">
+  <div>
+    <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube</a>
+    <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo</a>
+  </div>
+  <div class="ng-footer-copy">© 2026 PatSplat · All Rights Reserved</div>
+</div>
+
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script>
+  window.addEventListener("load", () => {
+    const ruffle = window.RufflePlayer.newest();
+    const player = ruffle.createPlayer();
+    player.style.width = "550px";
+    player.style.height = "400px";
+    const container = document.getElementById("swf-player-ep4");
+    container.replaceWith(player);
+    player.load("/mnt/user-data/uploads/1781486511140_Object-Oddballs-4-The-Green-Flovered-Mint.swf");
+  });
+</script>
 </body>
 </html>
