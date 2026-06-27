@@ -1,276 +1,1106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PatSplat's Site</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Tahoma&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Trebuchet+MS&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
+
   body {
-    background: #e8a000;
-    font-family: Tahoma, Verdana, Arial, sans-serif;
-    font-size: 11px;
-    color: #333;
+    background: #ffe8c2;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 2px, transparent 2px, transparent 14px);
+    font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
+    font-size: 13px;
+    color: #4a3a2a;
     min-height: 100vh;
   }
 
-  .ng-topbar {
-    background: linear-gradient(180deg, #cc7700 0%, #aa5500 40%, #883300 100%);
-    border-bottom: 3px solid #000;
+  .banner {
+    max-width: 940px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #ff9ecb 0%, #ffc97a 50%, #8ed8ff 100%);
+    border: 4px solid #fff;
+    outline: 3px dashed #ff6fa5;
+    outline-offset: -10px;
+    padding: 20px 24px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-title {
+    font-family: 'Comic Neue', cursive;
+    font-size: 42px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 3px 3px 0 #ff6fa5, -1px -1px 0 #c44a82;
+    letter-spacing: -1px;
+    transform: rotate(-2deg);
+    display: inline-block;
+  }
+  .banner-sub {
+    font-family: 'Comic Neue', cursive;
+    font-size: 14px;
+    color: #5a3a1a;
+    font-weight: 700;
+    margin-top: 4px;
+    background: rgba(255,255,255,0.55);
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .banner-stars {
+    position: absolute;
+    top: 8px; right: 16px;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #c44a82;
+    font-family: 'Comic Neue', cursive;
+    font-weight: 700;
+  }
+  .owner-toggle {
+    position: absolute;
+    bottom: 8px; right: 16px;
+    background: rgba(255,255,255,0.55);
+    border: none;
+    border-radius: 10px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #5a3a1a;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .owner-toggle:hover { background: rgba(255,255,255,0.8); }
+  .owner-toggle.unlocked { background: #5ec97a; color: #fff; }
+
+  .navbar {
+    max-width: 940px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #ffd9a0 0%, #ffc06a 100%);
+    border: 3px solid #fff;
+    border-top: none;
+    display: flex;
+    padding: 4px 10px;
+    gap: 4px;
+  }
+  .navbar button {
+    display: block;
+    padding: 6px 14px;
+    color: #8a4a1a;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    background: #fff5e0;
+    border: 2px solid #ffb366;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .navbar button:hover { background: #ffe0a0; }
+  .navbar button.active { background: #ff6fa5; color: #fff; border-color: #c44a82; }
+
+  .wrap {
+    max-width: 940px;
+    margin: 10px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 10px;
+    padding-bottom: 20px;
+  }
+
+  .main { display: flex; flex-direction: column; gap: 14px; }
+  .page { display: none; }
+  .page.active { display: flex; flex-direction: column; gap: 14px; }
+
+  .page-heading-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .page-heading {
+    font-family: 'Comic Neue', cursive;
+    font-size: 24px;
+    color: #d6478a;
+    font-weight: 700;
+    text-shadow: 2px 2px 0 #fff;
+  }
+  .page-subheading {
+    font-size: 11px;
+    color: #a88860;
+    margin-top: -6px;
+  }
+
+  .new-post-btn {
+    background: linear-gradient(135deg, #ff9ecb, #ff6fa5);
+    color: #fff;
+    border: 2px solid #c44a82;
+    border-radius: 14px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .new-post-btn:hover { background: #ff6fa5; }
+  .new-post-btn[disabled] {
+    background: #e8d8c0;
+    border-color: #d0c0a0;
+    color: #b0a088;
+    cursor: not-allowed;
+  }
+
+  .post {
+    background: #fffdf7;
+    border: 3px solid #ffc97a;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 rgba(255,159,203,0.35);
+  }
+  .post-header {
+    background: linear-gradient(135deg, #ffe0a0 0%, #ffcfe0 100%);
+    border-bottom: 2px dashed #ffb366;
+    padding: 9px 14px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .post-title {
+    font-family: 'Comic Neue', cursive;
+    font-size: 21px;
+    color: #d6478a;
+    font-weight: 700;
+    margin-bottom: 3px;
+    word-break: break-word;
+  }
+  .post-meta { font-size: 10px; color: #a88860; }
+  .post-meta .sep { margin: 0 5px; color: #e0c8a0; }
+  .post-body {
+    padding: 12px 14px 10px;
+    line-height: 1.7;
+    color: #5a4530;
+    font-size: 12.5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .post-tags { padding: 0 14px 12px; font-size: 10px; }
+  .post-tags span {
+    display: inline-block;
+    background: #d6f5e0;
+    border: 1px solid #8ed8a0;
+    color: #2a7a4a;
+    padding: 2px 8px;
+    margin-right: 4px;
+    border-radius: 10px;
+  }
+  .post-footer {
+    border-top: 2px dashed #ffd9a0;
+    padding: 7px 14px;
+    font-size: 10px;
+    color: #a88860;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff5e6;
+    border-radius: 0 0 6px 6px;
+  }
+  .post-actions { display: flex; gap: 10px; }
+  .post-actions button {
+    background: none;
+    border: none;
+    color: #ff6fa5;
+    font-weight: bold;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+  }
+  .post-actions button:hover { text-decoration: underline; }
+  .post-actions button.danger { color: #cc4444; }
+
+  .post-video-frame {
+    margin: 0 14px 10px;
+    border: 3px solid #ffc97a;
+    border-radius: 8px;
+    background: #000;
+    max-width: 420px;
+    overflow: hidden;
+  }
+  .post-video-frame img { display: block; width: 100%; }
+
+  .icon { width: 1em; height: 1em; vertical-align: -0.15em; display: inline-block; fill: currentColor; }
+  .icon-lg { width: 34px; height: 34px; }
+
+  .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .work-card {
+    background: #fffdf7;
+    border: 3px solid #8ed8ff;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 rgba(142,216,255,0.35);
+    overflow: hidden;
+  }
+  .work-thumb {
+    height: 130px;
+    background: linear-gradient(135deg, #2a2a4a, #1a1a2a);
+    border-bottom: 3px solid #8ed8ff;
+    display: block;
+    position: relative;
+  }
+  .work-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-thumb-badge {
+    position: absolute;
+    top: 6px; left: 6px;
+    background: #ff6fa5;
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    height: 48px;
+    gap: 4px;
   }
-  .ng-logo { font-family: Impact, 'Arial Black', sans-serif; font-size: 32px; color: #fff; text-shadow: 2px 2px 0 #000; letter-spacing: -1px; }
-  .ng-logo span { color: #ffcc00; }
-  .ng-tagline { font-size: 9px; color: #ffcc88; font-style: italic; }
+  .work-icon-circle {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff6fa5;
+  }
+  .work-info { padding: 10px 12px; }
+  .work-title { font-family: 'Comic Neue', cursive; font-size: 16px; color: #2a6a9a; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .work-title a { color: inherit; text-decoration: none; }
+  .work-title a:hover { text-decoration: underline; }
+  .work-desc { font-size: 11px; color: #5a4530; line-height: 1.5; margin-bottom: 6px; }
+  .work-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #8ed8ff, #6ab0ff);
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid #4a8acc;
+  }
+  .work-link:hover { background: #6ab0ff; }
+  .work-card.full { grid-column: span 2; }
+  .work-card.full .work-thumb { height: 220px; }
 
-  .ng-nav { background: linear-gradient(180deg, #333 0%, #111 100%); border-bottom: 2px solid #ffaa00; display: flex; height: 28px; }
-  .ng-nav a { display: flex; align-items: center; padding: 0 12px; color: #ffcc88; text-decoration: none; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-right: 1px solid #444; height: 100%; }
-  .ng-nav a:first-child { border-left: 1px solid #444; }
-  .ng-nav a:hover, .ng-nav a.active { background: #ffaa00; color: #000; }
+  .side { display: flex; flex-direction: column; gap: 12px; }
+  .side-box {
+    background: #fffdf7;
+    border: 3px solid #8ed8ff;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 rgba(142,216,255,0.35);
+  }
+  .side-box-title {
+    background: linear-gradient(135deg, #8ed8ff 0%, #b0a4ff 100%);
+    color: #fff;
+    font-family: 'Comic Neue', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 5px 5px 0 0;
+  }
+  .side-box-body { padding: 10px 12px; font-size: 11.5px; color: #5a4530; line-height: 1.6; }
 
-  .ng-body { max-width: 980px; margin: 0 auto; padding: 8px; display: grid; grid-template-columns: 1fr 210px; gap: 8px; }
+  .profile-pic {
+    width: 78px; height: 78px;
+    margin: 0 auto 8px;
+    background: linear-gradient(135deg, #ff9ecb, #8ed8ff);
+    border: 3px solid #fff;
+    outline: 2px solid #ffb366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Comic Neue', cursive;
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .profile-name { text-align: center; font-weight: 700; color: #d6478a; font-size: 14px; margin-bottom: 2px; font-family: 'Comic Neue', cursive; }
+  .profile-tag { text-align: center; font-size: 10px; color: #a88860; margin-bottom: 8px; }
 
-  .ng-panel { background: #fff; border: 1px solid #996600; margin-bottom: 8px; overflow: hidden; }
-  .ng-panel-header { background: linear-gradient(180deg, #ffcc00 0%, #cc8800 100%); border-bottom: 2px solid #664400; padding: 4px 8px; display: flex; align-items: center; justify-content: space-between; }
-  .ng-panel-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 14px; color: #000; letter-spacing: 0.5px; }
-  .ng-panel-body { padding: 10px; }
+  .link-list { list-style: none; }
+  .link-list li { padding: 5px 0; border-bottom: 1px dotted #e0d0c0; display: flex; align-items: center; gap: 8px; }
+  .link-list li:last-child { border-bottom: none; }
+  .link-list a { color: #ff6fa5; text-decoration: none; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+  .link-list a:hover { text-decoration: underline; }
+  .link-list .desc { display: block; font-size: 9.5px; color: #c0a888; margin-top: 1px; margin-left: 22px; }
+  .link-icon-wrap { color: #ff6fa5; flex-shrink: 0; }
 
-  .featured-wrap { display: flex; gap: 12px; }
-  .featured-thumb { width: 160px; height: 120px; background: linear-gradient(135deg, #1a1a2e, #16213e); border: 2px solid #664400; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; }
-  .featured-thumb-label { position: absolute; bottom:0; left:0; right:0; background: rgba(0,0,0,0.75); color: #ffcc00; font-size: 8px; font-weight: bold; text-align: center; padding: 2px 4px; text-transform: uppercase; letter-spacing: 1px; }
-  .featured-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 20px; color: #cc4400; line-height: 1.1; margin-bottom: 4px; }
-  .featured-meta { font-size: 10px; color: #666; margin-bottom: 6px; }
-  .featured-meta a { color: #cc6600; font-weight: bold; text-decoration: none; }
-  .featured-meta a:hover { text-decoration: underline; }
-  .featured-desc { font-size: 11px; color: #333; line-height: 1.6; margin-bottom: 8px; }
+  .archive-list { list-style: none; }
+  .archive-list li { padding: 3px 0; font-size: 11px; }
+  .archive-list a { color: #6a8aff; text-decoration: none; cursor: pointer; }
+  .archive-list a:hover { text-decoration: underline; }
 
-  .sub-item { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid #e8c060; align-items: flex-start; }
-  .sub-item:last-child { border-bottom: none; }
-  .sub-thumb { width: 52px; height: 40px; border: 1px solid #664400; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-  .sub-title { color: #0033aa; font-weight: bold; font-size: 11px; text-decoration: none; display: block; margin-bottom: 2px; }
-  .sub-title:hover { color: #cc4400; text-decoration: underline; }
-  .sub-meta { font-size: 9px; color: #888; }
-  .badge { display: inline-block; font-size: 8px; font-weight: bold; padding: 1px 4px; text-transform: uppercase; margin-right: 3px; }
-  .b-anim { background: #003399; color: #fff; }
-  .b-game { background: #006633; color: #fff; }
+  hr.divider { border: none; border-top: 1px dotted #e0d0c0; margin: 10px 0; }
 
-  .ng-hr { height: 1px; background: linear-gradient(90deg, transparent, #cc8800, transparent); border: none; margin: 4px 0; }
+  .site-footer {
+    max-width: 940px;
+    margin: 14px auto 0;
+    border: 4px solid #fff;
+    outline: 3px dashed #8ed8ff;
+    outline-offset: -8px;
+    background: linear-gradient(135deg, #8ed8ff, #b0a4ff);
+    border-radius: 8px;
+    padding: 12px 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 10px;
+  }
+  .site-footer a { color: #fff; text-decoration: underline; font-weight: bold; }
 
-  .ng-sidebar { display: flex; flex-direction: column; gap: 8px; }
-  .ng-side-panel { background: #fff; border: 1px solid #996600; overflow: hidden; }
-  .ng-side-header { background: linear-gradient(180deg, #ff6600 0%, #cc3300 100%); border-bottom: 2px solid #661100; padding: 3px 8px; }
-  .ng-side-title { font-family: Impact, 'Arial Black', sans-serif; font-size: 13px; color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
-  .ng-side-body { padding: 7px; }
+  .sparkle { color: #ffb366; }
 
-  .user-card { display: flex; flex-direction: column; align-items: center; padding: 8px 6px; text-align: center; }
-  .user-icon { width: 64px; height: 64px; background: linear-gradient(135deg, #ffaa00, #cc5500); border: 3px solid #664400; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 6px; }
-  .user-name { font-family: Impact, sans-serif; font-size: 17px; color: #cc4400; margin-bottom: 4px; }
-  .user-stats { width: 100%; font-size: 10px; text-align: left; }
-  .user-stats td:first-child { color: #888; padding-right: 6px; }
-  .user-stats td:last-child { font-weight: bold; }
+  .empty-note {
+    background: #fffdf7;
+    border: 3px dashed #ffc97a;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: #a88860;
+    font-size: 12px;
+  }
 
-  .contact-btn { display: block; background: linear-gradient(180deg, #cc2200, #881100); color: #fff; text-decoration: none; padding: 6px 8px; font-size: 10px; font-weight: bold; text-align: center; border: 1px outset #ff4400; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
-  .contact-btn:hover { filter: brightness(1.2); }
-  .contact-btn.gold { background: linear-gradient(180deg, #cc6600, #884400); border-color: #ff8800; }
+  .about-card {
+    background: #fffdf7;
+    border: 3px solid #ffc97a;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 rgba(255,159,203,0.35);
+    overflow: hidden;
+  }
+  .about-top {
+    background: linear-gradient(135deg, #ffe0a0 0%, #ffcfe0 100%);
+    border-bottom: 2px dashed #ffb366;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .about-pic {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #ff9ecb, #8ed8ff);
+    border: 3px solid #fff;
+    outline: 2px solid #ffb366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Comic Neue', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .about-name { font-family: 'Comic Neue', cursive; font-size: 20px; color: #d6478a; font-weight: 700; }
+  .about-role { font-size: 11px; color: #a88860; margin-top: 2px; }
 
-  .ng-footer { max-width: 980px; margin: 4px auto 0; background: #000; border-top: 3px solid #cc6600; padding: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .ng-footer a { color: #cc7700; font-size: 10px; text-decoration: none; margin-right: 12px; }
-  .ng-footer a:hover { color: #ffaa00; text-decoration: underline; }
-  .ng-footer-copy { font-size: 9px; color: #555; }
+  .about-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 16px 18px;
+  }
+  .about-fact {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .about-fact-icon {
+    width: 30px; height: 30px;
+    background: #d6f5e0;
+    border: 1px solid #8ed8a0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2a7a4a;
+    flex-shrink: 0;
+  }
+  .about-fact-label { font-size: 9.5px; color: #a88860; text-transform: uppercase; letter-spacing: 0.5px; }
+  .about-fact-value { font-size: 12px; color: #4a3a2a; font-weight: bold; }
 
-  /* SWF PLAYER */
-  .swf-wrap {
-    background: #000;
-    border: 2px solid #664400;
-    display: inline-block;
-    line-height: 0;
+  .about-blurb {
+    padding: 4px 18px 18px;
+    line-height: 1.7;
+    color: #5a4530;
+    font-size: 12.5px;
+  }
+  .about-blurb p { margin-bottom: 10px; }
+  .about-blurb p:last-child { margin-bottom: 0; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(74,58,42,0.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fffdf7;
+    border: 4px solid #ff9ecb;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0 rgba(255,159,203,0.4);
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    background: linear-gradient(135deg, #ffe0a0 0%, #ffcfe0 100%);
+    border-bottom: 2px dashed #ffb366;
+    padding: 12px 16px;
+    font-family: 'Comic Neue', cursive;
+    font-size: 18px;
+    color: #d6478a;
+    font-weight: 700;
+    border-radius: 7px 7px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #d6478a;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+  }
+  .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .modal-body label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #8a6a4a;
+    margin-bottom: -4px;
+  }
+  .modal-body input,
+  .modal-body textarea {
+    width: 100%;
+    border: 2px solid #ffc97a;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    background: #fffaf0;
+    color: #4a3a2a;
+  }
+  .modal-body textarea { resize: vertical; min-height: 110px; line-height: 1.5; }
+  .modal-body p.modal-hint { font-size: 11px; color: #a88860; line-height: 1.5; }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .modal-actions button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 7px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+  }
+  .btn-cancel { background: #fff5e0; border: 2px solid #ffb366; color: #8a4a1a; }
+  .btn-cancel:hover { background: #ffe0a0; }
+  .btn-save { background: linear-gradient(135deg, #ff9ecb, #ff6fa5); border: 2px solid #c44a82; color: #fff; }
+  .btn-save:hover { background: #ff6fa5; }
+
+  .editor-error {
+    font-size: 11px;
+    color: #cc4444;
+    display: none;
+  }
+
+  .loading-note {
+    text-align: center;
+    color: #a88860;
+    font-size: 11px;
+    padding: 10px;
   }
 </style>
 </head>
 <body>
 
-<div class="ng-topbar">
-  <div>
-    <div class="ng-logo">Pat<span>Splat</span></div>
-    <div class="ng-tagline">Animator · Flash Creator · Object Show Author</div>
-  </div>
+<div class="banner">
+  <div class="banner-stars">* ~ welcome to my corner of the internet ~ *</div>
+  <div class="banner-title">PatSplat's Site!</div>
+  <br>
+  <span class="banner-sub">animation, flash games, and random rambles :)</span>
+  <button class="owner-toggle" id="owner-toggle">owner login</button>
 </div>
 
-<div class="ng-nav">
-  <a href="#" class="active">Home</a>
-  <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube</a>
+<div class="navbar">
+  <button class="active" data-page="blog">Blog</button>
+  <button data-page="work">Games &amp; Videos</button>
+  <button data-page="about">About Me</button>
+  <button data-page="contact">Contact</button>
+</div>
+
+<div class="wrap">
+
+  <div class="main">
+
+    <div class="page active" id="page-blog">
+      <div class="page-heading-row">
+        <div>
+          <div class="page-heading">the blog</div>
+          <div class="page-subheading">updates on whatever i'm working on</div>
+        </div>
+        <button class="new-post-btn" id="new-post-btn" disabled title="log in as owner to post">+ new post</button>
+      </div>
+
+      <div id="blog-loading" class="loading-note">loading posts...</div>
+      <div id="blog-posts"></div>
+      <div id="blog-empty" class="empty-note" style="display:none;">
+        no posts yet! log in as owner and click "+ new post" to write the first one.
+      </div>
+    </div>
+
+    <div class="page" id="page-work">
+      <div>
+        <div class="page-heading">games &amp; videos</div>
+        <div class="page-subheading">everything i've made, in one place</div>
+      </div>
+
+      <div class="work-grid">
+
+        <div class="work-card full">
+          <a href="https://www.youtube.com/watch?v=-to_1mVVjZg" target="_blank" class="work-thumb">
+            <span class="work-thumb-badge">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              Object Oddballs
+            </span>
+            <div class="work-icon-circle">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <img src="https://img.youtube.com/vi/-to_1mVVjZg/maxresdefault.jpg" alt="OO 4: Minty Greeny" onerror="this.src='https://img.youtube.com/vi/-to_1mVVjZg/hqdefault.jpg'">
+          </a>
+          <div class="work-info">
+            <div class="work-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              <a href="https://www.youtube.com/watch?v=-to_1mVVjZg" target="_blank">OO 4: Minty Greeny</a>
+            </div>
+            <div class="work-desc">the newest episode of Object Oddballs, my original object show with 11 characters competing for victory.</div>
+            <a href="https://www.youtube.com/watch?v=-to_1mVVjZg" target="_blank" class="work-link">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              watch on youtube
+            </a>
+          </div>
+        </div>
+
+        <div class="work-card">
+          <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="work-thumb" style="background:linear-gradient(135deg,#3a2a5a,#2a1a4a); display:flex; align-items:center; justify-content:center;">
+            <span class="work-thumb-badge">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              Series
+            </span>
+            <svg class="icon icon-lg" style="color:#fff;" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+          </a>
+          <div class="work-info">
+            <div class="work-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              <a href="https://www.youtube.com/@PatSplat29" target="_blank">Object Oddballs &mdash; Full Series</a>
+            </div>
+            <div class="work-desc">all episodes of the show, hand-animated in Adobe Animate. follows donut hole, baseball, candy corn, and more.</div>
+            <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="work-link">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              watch on youtube
+            </a>
+          </div>
+        </div>
+
+        <div class="work-card">
+          <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="work-thumb" style="background:linear-gradient(135deg,#1a3a2a,#0a2a1a); display:flex; align-items:center; justify-content:center;">
+            <span class="work-thumb-badge">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              Flash Game
+            </span>
+            <svg class="icon icon-lg" style="color:#fff;" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM7 14H5v2H3.5v-2H1.5v-1.5h2V11H5v1.5h2V14zm3.5-1.5h-2v-1.5h2V12.5zm5.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          </a>
+          <div class="work-info">
+            <div class="work-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FaceWars</a>
+            </div>
+            <div class="work-desc">press space to attack, dodge the purple guys, 3 lives. my first scripted flash game.</div>
+            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="work-link">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              play on flashdojo
+            </a>
+          </div>
+        </div>
+
+        <div class="work-card full">
+          <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="work-thumb" style="background:linear-gradient(135deg,#3a1a3a,#2a0a2a); display:flex; align-items:center; justify-content:center;">
+            <span class="work-thumb-badge">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              Flash Dojo
+            </span>
+            <svg class="icon icon-lg" style="color:#fff;" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+          </a>
+          <div class="work-info">
+            <div class="work-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              <a href="https://flashdojo.com/user/PatSplat29" target="_blank">Flash Dojo Collection</a>
+            </div>
+            <div class="work-desc">everything else i've put up on FlashDojo &mdash; flash-style games and short animations.</div>
+            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="work-link">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              browse on flashdojo
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="page" id="page-about">
+      <div><div class="page-heading">about me</div></div>
+
+      <div class="about-card">
+        <div class="about-top">
+          <div class="about-pic">PS</div>
+          <div>
+            <div class="about-name">PatSplat</div>
+            <div class="about-role">Animator &middot; Flash Creator &middot; Object Show Author</div>
+          </div>
+        </div>
+
+        <div class="about-facts">
+          <div class="about-fact">
+            <div class="about-fact-icon">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3 1-1-2.5-2.5V8H12zM12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+            </div>
+            <div>
+              <div class="about-fact-label">animating for</div>
+              <div class="about-fact-value">about 1 year</div>
+            </div>
+          </div>
+          <div class="about-fact">
+            <div class="about-fact-icon">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+            </div>
+            <div>
+              <div class="about-fact-label">main project</div>
+              <div class="about-fact-value">Object Oddballs</div>
+            </div>
+          </div>
+          <div class="about-fact">
+            <div class="about-fact-icon">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1.5 5.5l-3 3-1.5-1.5-3.5 3.5H6l4-4 1.5 1.5 3-3 3.5 3.5h-1.5z"/></svg>
+            </div>
+            <div>
+              <div class="about-fact-label">software</div>
+              <div class="about-fact-value">Adobe Animate 2022</div>
+            </div>
+          </div>
+          <div class="about-fact">
+            <div class="about-fact-icon">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M20.71 4.04c.39-.39.39-1.04 0-1.41-.37-.4-1.02-.4-1.41 0l-1.34 1.34 1.41 1.41 1.34-1.34zm-3.12 2.13L4 19.75V21h1.25L18.84 7.41l-1.25-1.24z"/></svg>
+            </div>
+            <div>
+              <div class="about-fact-label">drawing tablet</div>
+              <div class="about-fact-value">Wacom Intuos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-blurb">
+          <p>
+            I've been animating for almost a year and have been throwing everything into it &mdash;
+            frame-by-frame characters, object show episodes, weird little Flash games. If it moves
+            and makes people smile, I want to make it.
+          </p>
+          <p>
+            I have a deep love for the Flash animation era and try to keep that style alive through
+            my own games and animations. Object Oddballs is where I get to push my storytelling and
+            character design the furthest.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-contact">
+      <div><div class="page-heading">contact</div></div>
+      <div class="post">
+        <div class="post-body" style="padding:16px;">
+          <p>want to collab on an animation, an object show, or a flash project? find me here:</p>
+          <ul class="link-list" style="margin-top:10px;">
+            <li>
+              <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg></span>
+              <div>
+                <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube &middot; @PatSplat29</a>
+                <span class="desc">object oddballs eps + more</span>
+              </div>
+            </li>
+            <li>
+              <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span>
+              <div>
+                <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo &middot; PatSplat29</a>
+                <span class="desc">flash games + animations</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="side">
+
+    <div class="side-box">
+      <div class="side-box-title">about me!</div>
+      <div class="side-box-body">
+        <div class="profile-pic">PS</div>
+        <div class="profile-name">PatSplat</div>
+        <div class="profile-tag">animator + flash creator</div>
+        <hr class="divider">
+        i've been animating for almost a year now! i make an object show called Object Oddballs and
+        sometimes build little flash games :)
+      </div>
+    </div>
+
+    <div class="side-box">
+      <div class="side-box-title">find me!</div>
+      <div class="side-box-body">
+        <ul class="link-list">
+          <li>
+            <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg></span>
+            <div>
+              <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube &middot; @PatSplat29</a>
+              <span class="desc">object oddballs eps + more</span>
+            </div>
+          </li>
+          <li>
+            <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span>
+            <div>
+              <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo &middot; PatSplat29</a>
+              <span class="desc">flash games + animations</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="side-box">
+      <div class="side-box-title">categories</div>
+      <div class="side-box-body">
+        <ul class="archive-list" id="category-list">
+          <li style="color:#c0a888;">no posts yet</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="site-footer">
+  PatSplat &middot;
+  <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube</a> &middot;
   <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo</a>
-  <a href="#about">About</a>
-  <a href="#contact">Contact</a>
+  <br>&copy; 2026 PatSplat. all rights reserved!
 </div>
 
-<div class="ng-body">
-
-  <div>
-
-    <!-- LATEST EPISODE -->
-    <div class="ng-panel">
-      <div class="ng-panel-header">
-        <div class="ng-panel-title">🌿 LATEST — OO 4: Minty Greeny</div>
-        <div style="font-size:9px; color:#664400;">Newest Episode · Object Oddballs</div>
-      </div>
-      <div class="ng-panel-body">
-        <div style="margin-bottom:8px;">
-          <div style="font-family:Impact,sans-serif; font-size:18px; color:#cc4400; margin-bottom:4px;">OO 4: Minty Greeny</div>
-          <div style="font-size:10px; color:#666; margin-bottom:10px;">
-            By <a href="https://www.youtube.com/@PatSplat29" target="_blank" style="color:#cc6600; font-weight:bold; text-decoration:none;">PatSplat29</a>
-            &nbsp;·&nbsp; Episode 4 of Object Oddballs
-          </div>
-        </div>
-        <div class="swf-wrap">
-          <div id="swf-player-ep4"></div>
-        </div>
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-overlay">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <span>owner login</span>
+      <button class="modal-close" id="login-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-hint">enter your passphrase to unlock posting, editing, and deleting blog posts. this only works for you, on this device/session.</p>
+      <label for="input-passphrase">passphrase</label>
+      <input type="password" id="input-passphrase" placeholder="••••••••" />
+      <div class="editor-error" id="login-error">that's not it, try again!</div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="login-cancel-btn">cancel</button>
+        <button class="btn-save" id="login-submit-btn">unlock</button>
       </div>
     </div>
-
-    <!-- ALL SUBMISSIONS -->
-    <div class="ng-panel">
-      <div class="ng-panel-header">
-        <div class="ng-panel-title">📁 My Work</div>
-      </div>
-      <div class="ng-panel-body">
-
-        <div class="sub-item">
-          <div class="sub-thumb" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);">🍩</div>
-          <div style="flex:1;">
-            <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="sub-title">Object Oddballs — Full Series</a>
-            <div class="sub-meta"><span class="badge b-anim">ANIMATION</span> YouTube · @PatSplat29</div>
-            <div class="sub-meta" style="margin-top:3px; color:#555;">11 characters, original story, hand-animated in Adobe Animate. Ongoing series.</div>
-          </div>
-        </div>
-
-        <div class="sub-item">
-          <div class="sub-thumb" style="background:linear-gradient(135deg,#003300,#006633);">🎮</div>
-          <div style="flex:1;">
-            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="sub-title">FaceWars — Flash Game</a>
-            <div class="sub-meta"><span class="badge b-game">GAME</span> FlashDojo · PatSplat29</div>
-            <div class="sub-meta" style="margin-top:3px; color:#555;">Press Space to attack. Dodge the purple dudes. 3 lives — make them count!</div>
-          </div>
-        </div>
-
-        <div class="sub-item">
-          <div class="sub-thumb" style="background:linear-gradient(135deg,#220044,#440088);">⚡</div>
-          <div style="flex:1;">
-            <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="sub-title">More Flash Stuff — FlashDojo</a>
-            <div class="sub-meta"><span class="badge" style="background:#884400;color:#fff;">FLASH</span> FlashDojo · PatSplat29</div>
-            <div class="sub-meta" style="margin-top:3px; color:#555;">Collection of Flash-style games and animations. Keeping the classic web animation spirit alive.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ABOUT -->
-    <div class="ng-panel" id="about">
-      <div class="ng-panel-header"><div class="ng-panel-title">📰 About Me</div></div>
-      <div class="ng-panel-body" style="line-height:1.7; color:#333; font-size:11px;">
-        <p style="margin-bottom:8px;">
-          I've been animating for almost a year and have been throwing everything into it.
-          Whether it's frame-by-frame characters, object show episodes, or Flash games —
-          if it moves and makes people smile, I want to make it.
-        </p>
-        <p>
-          I have a deep love for the Flash animation era and work to keep that style alive
-          through my own games and animations. Object Oddballs is where I get to push
-          my storytelling and character design the furthest.
-        </p>
-        <hr class="ng-hr" style="margin:10px 0;">
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; font-size:10px;">
-          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">~1 yr</div><div style="color:#888;">Animating</div></div>
-          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">11</div><div style="color:#888;">OO Characters</div></div>
-          <div><div style="font-family:Impact,sans-serif; font-size:20px; color:#cc4400;">Flash</div><div style="color:#888;">Style</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SKILLS -->
-    <div class="ng-panel">
-      <div class="ng-panel-header"><div class="ng-panel-title">⚡ Skills &amp; Tools</div></div>
-      <div class="ng-panel-body" style="display:flex; flex-direction:column; gap:6px;">
-        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Animation (frame-by-frame, Flash style)</span><span style="color:#cc4400; font-weight:bold;">Adobe Animate 2022</span></div>
-        <hr class="ng-hr">
-        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Drawing Tablet</span><span style="color:#cc4400; font-weight:bold;">Wacom Intuos</span></div>
-        <hr class="ng-hr">
-        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Flash Games</span><span style="color:#cc4400; font-weight:bold;">FlashDojo</span></div>
-        <hr class="ng-hr">
-        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Character Design &amp; Storytelling</span><span style="color:#cc4400; font-weight:bold;">Object Oddballs</span></div>
-        <hr class="ng-hr">
-        <div style="font-size:10px; display:flex; justify-content:space-between;"><span>Video Production &amp; Publishing</span><span style="color:#cc4400; font-weight:bold;">YouTube</span></div>
-      </div>
-    </div>
-
   </div>
-
-  <!-- SIDEBAR -->
-  <div class="ng-sidebar">
-
-    <div class="ng-side-panel">
-      <div class="ng-side-header"><div class="ng-side-title">👤 PatSplat29</div></div>
-      <div class="user-card">
-        <div class="user-icon">🎨</div>
-        <div class="user-name">PatSplat29</div>
-        <div style="font-size:9px; color:#888; margin-bottom:8px;">Animator &amp; Flash Creator</div>
-        <table class="user-stats">
-          <tr><td>Animating:</td><td>~1 Year</td></tr>
-          <tr><td>Main Show:</td><td>Object Oddballs</td></tr>
-          <tr><td>Style:</td><td>Flash</td></tr>
-          <tr><td>Tool:</td><td>Animate 2022</td></tr>
-          <tr><td>Tablet:</td><td>Wacom Intuos</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="ng-side-panel" id="contact">
-      <div class="ng-side-header"><div class="ng-side-title">✉ Contact</div></div>
-      <div class="ng-side-body" style="font-size:10px; color:#555; margin-bottom:6px; line-height:1.5;">
-        Want to collab on an animation or object show? Find me here:
-      </div>
-      <div class="ng-side-body" style="padding-top:0;">
-        <a href="https://www.youtube.com/@PatSplat29" target="_blank" class="contact-btn">▶ YouTube — @PatSplat29</a>
-        <a href="https://flashdojo.com/user/PatSplat29" target="_blank" class="contact-btn gold">⚡ FlashDojo — PatSplat29</a>
-      </div>
-    </div>
-
-    <div class="ng-side-panel">
-      <div class="ng-side-header"><div class="ng-side-title">🍩 Object Oddballs Cast</div></div>
-      <div class="ng-side-body" style="font-size:10px; color:#333; line-height:1.9;">
-        🍩 Donut Hole<br>
-        ⚾ Baseball<br>
-        🍬 Candy Corn<br>
-        <span style="color:#888; font-size:9px;">+ 8 more characters...</span>
-      </div>
-    </div>
-
-  </div>
-
 </div>
 
-<div class="ng-footer">
-  <div>
-    <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube</a>
-    <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo</a>
+<!-- POST EDITOR MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="modal-title-text">write a new post</span>
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label for="input-title">title</label>
+      <input type="text" id="input-title" placeholder="finished ep 5 today!!" />
+
+      <label for="input-category">category</label>
+      <input type="text" id="input-category" placeholder="Animation" />
+
+      <label for="input-tags">tags (comma separated)</label>
+      <input type="text" id="input-tags" placeholder="object oddballs, animation" />
+
+      <label for="input-body">what's up?</label>
+      <textarea id="input-body" placeholder="write your post here..."></textarea>
+
+      <div class="editor-error" id="editor-error">title and post text can't be empty!</div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cancel-btn">cancel</button>
+        <button class="btn-save" id="save-btn">post it!</button>
+      </div>
+    </div>
   </div>
-  <div class="ng-footer-copy">© 2026 PatSplat · All Rights Reserved</div>
 </div>
 
-<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 <script>
-  window.addEventListener("load", () => {
-    const ruffle = window.RufflePlayer.newest();
-    const player = ruffle.createPlayer();
-    player.style.width = "550px";
-    player.style.height = "400px";
-    const container = document.getElementById("swf-player-ep4");
-    container.replaceWith(player);
-    player.load("/mnt/user-data/uploads/1781486511140_Object-Oddballs-4-The-Green-Flovered-Mint.swf");
+  const OWNER_PASSPHRASE = "patsplat29";
+  let isOwner = false;
+  let posts = [];
+  let editingId = null;
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  async function loadPosts() {
+    document.getElementById('blog-loading').style.display = 'block';
+    try {
+      const result = await window.storage.get('patsplat-blog-posts', false);
+      posts = (result && result.value) ? JSON.parse(result.value) : [];
+    } catch (e) {
+      posts = [];
+    }
+    document.getElementById('blog-loading').style.display = 'none';
+    renderPosts();
+  }
+
+  async function savePosts() {
+    try {
+      await window.storage.set('patsplat-blog-posts', JSON.stringify(posts), false);
+    } catch (e) {
+      console.error('failed to save posts', e);
+    }
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('blog-posts');
+    const empty = document.getElementById('blog-empty');
+    const catList = document.getElementById('category-list');
+
+    if (posts.length === 0) {
+      container.innerHTML = '';
+      empty.style.display = 'block';
+      catList.innerHTML = '<li style="color:#c0a888;">no posts yet</li>';
+      return;
+    }
+    empty.style.display = 'none';
+
+    const sorted = [...posts].sort((a, b) => b.createdAt - a.createdAt);
+
+    container.innerHTML = sorted.map(post => {
+      const tagsHtml = (post.tags || []).map(t => `<span>${escapeHtml(t)}</span>`).join('');
+      const actionsHtml = isOwner ? `
+        <div class="post-actions">
+          <button class="edit-btn" data-id="${post.id}">edit</button>
+          <button class="danger delete-btn" data-id="${post.id}">delete</button>
+        </div>` : '';
+      return `
+        <div class="post" data-id="${post.id}" style="margin-bottom:14px;">
+          <div class="post-header">
+            <div>
+              <div class="post-title">${escapeHtml(post.title)}</div>
+              <div class="post-meta">
+                posted by PatSplat<span class="sep">|</span>${formatDate(post.createdAt)}${post.category ? `<span class="sep">|</span>${escapeHtml(post.category)}` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="post-body">${escapeHtml(post.body)}</div>
+          ${tagsHtml ? `<div class="post-tags">${tagsHtml}</div>` : ''}
+          <div class="post-footer">
+            <span>${post.category ? 'filed under: ' + escapeHtml(post.category) : ''}</span>
+            ${actionsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => openEditor(btn.dataset.id));
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deletePost(btn.dataset.id));
+    });
+
+    const cats = {};
+    posts.forEach(p => { if (p.category) cats[p.category] = (cats[p.category] || 0) + 1; });
+    const catEntries = Object.entries(cats);
+    catList.innerHTML = catEntries.length
+      ? catEntries.map(([c, n]) => `<li><a>${escapeHtml(c)} (${n})</a></li>`).join('')
+      : '<li style="color:#c0a888;">no posts yet</li>';
+  }
+
+  function openEditor(id) {
+    if (!isOwner) return;
+    editingId = id || null;
+    document.getElementById('editor-error').style.display = 'none';
+    if (id) {
+      const post = posts.find(p => p.id === id);
+      document.getElementById('modal-title-text').textContent = 'edit post';
+      document.getElementById('input-title').value = post.title;
+      document.getElementById('input-category').value = post.category || '';
+      document.getElementById('input-tags').value = (post.tags || []).join(', ');
+      document.getElementById('input-body').value = post.body;
+    } else {
+      document.getElementById('modal-title-text').textContent = 'write a new post';
+      document.getElementById('input-title').value = '';
+      document.getElementById('input-category').value = '';
+      document.getElementById('input-tags').value = '';
+      document.getElementById('input-body').value = '';
+    }
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('input-title').focus();
+  }
+
+  function closeEditor() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    editingId = null;
+  }
+
+  async function handleSave() {
+    if (!isOwner) return;
+    const title = document.getElementById('input-title').value.trim();
+    const category = document.getElementById('input-category').value.trim();
+    const tagsRaw = document.getElementById('input-tags').value.trim();
+    const body = document.getElementById('input-body').value.trim();
+
+    if (!title || !body) {
+      document.getElementById('editor-error').style.display = 'block';
+      return;
+    }
+
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    if (editingId) {
+      const post = posts.find(p => p.id === editingId);
+      post.title = title; post.category = category; post.tags = tags; post.body = body;
+    } else {
+      posts.push({
+        id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+        title, category, tags, body, createdAt: Date.now()
+      });
+    }
+
+    await savePosts();
+    renderPosts();
+    closeEditor();
+  }
+
+  function deletePost(id) {
+    if (!isOwner) return;
+    if (!confirm('delete this post? this cant be undone!')) return;
+    posts = posts.filter(p => p.id !== id);
+    savePosts();
+    renderPosts();
+  }
+
+  function setOwnerState(unlocked) {
+    isOwner = unlocked;
+    const toggle = document.getElementById('owner-toggle');
+    const newPostBtn = document.getElementById('new-post-btn');
+    if (unlocked) {
+      toggle.textContent = 'owner mode (log out)';
+      toggle.classList.add('unlocked');
+      newPostBtn.disabled = false;
+      newPostBtn.title = '';
+    } else {
+      toggle.textContent = 'owner login';
+      toggle.classList.remove('unlocked');
+      newPostBtn.disabled = true;
+      newPostBtn.title = 'log in as owner to post';
+    }
+    renderPosts();
+  }
+
+  document.getElementById('owner-toggle').addEventListener('click', () => {
+    if (isOwner) {
+      setOwnerState(false);
+    } else {
+      document.getElementById('input-passphrase').value = '';
+      document.getElementById('login-error').style.display = 'none';
+      document.getElementById('login-overlay').classList.add('open');
+      document.getElementById('input-passphrase').focus();
+    }
   });
+
+  function closeLogin() {
+    document.getElementById('login-overlay').classList.remove('open');
+  }
+  document.getElementById('login-close-btn').addEventListener('click', closeLogin);
+  document.getElementById('login-cancel-btn').addEventListener('click', closeLogin);
+  document.getElementById('login-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'login-overlay') closeLogin();
+  });
+  document.getElementById('login-submit-btn').addEventListener('click', () => {
+    const val = document.getElementById('input-passphrase').value;
+    if (val === OWNER_PASSPHRASE) {
+      setOwnerState(true);
+      closeLogin();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  });
+  document.getElementById('input-passphrase').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('login-submit-btn').click();
+  });
+
+  document.getElementById('new-post-btn').addEventListener('click', () => openEditor(null));
+  document.getElementById('cancel-btn').addEventListener('click', closeEditor);
+  document.getElementById('modal-close-btn').addEventListener('click', closeEditor);
+  document.getElementById('save-btn').addEventListener('click', handleSave);
+  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-overlay') closeEditor();
+  });
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.navbar button[data-page="' + name + '"]').forEach(b => b.classList.add('active'));
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('.navbar button[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.page));
+  });
+
+  setOwnerState(false);
+  loadPosts();
 </script>
+
 </body>
 </html>
