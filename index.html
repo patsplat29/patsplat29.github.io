@@ -535,6 +535,98 @@
     font-size: 11px;
     padding: 10px;
   }
+
+  /* CONTACT PAGE */
+  .contact-intro {
+    font-size: 12.5px;
+    color: #5a4530;
+    line-height: 1.6;
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 26px 18px;
+    border: 3px solid #fff;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .contact-card:hover {
+    transform: translateY(-3px);
+  }
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
+    pointer-events: none;
+  }
+  .contact-card-email {
+    background: linear-gradient(135deg, #ff9ecb 0%, #ff6fa5 100%);
+    box-shadow: 4px 4px 0 rgba(196,74,130,0.35);
+  }
+  .contact-card-email:hover { box-shadow: 6px 6px 0 rgba(196,74,130,0.4); }
+  .contact-card-discord {
+    background: linear-gradient(135deg, #9aa8ff 0%, #6a78e8 100%);
+    box-shadow: 4px 4px 0 rgba(74,82,180,0.35);
+  }
+  .contact-card-discord:hover { box-shadow: 6px 6px 0 rgba(74,82,180,0.4); }
+  .contact-card-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .contact-card-email .contact-card-icon { color: #ff6fa5; }
+  .contact-card-discord .contact-card-icon { color: #6a78e8; }
+  .contact-card-icon .icon { width: 28px; height: 28px; }
+  .contact-card-title {
+    font-family: 'Comic Neue', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .contact-card-value {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(0,0,0,0.15);
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    word-break: break-word;
+    position: relative;
+    z-index: 1;
+  }
+  .contact-card-desc {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 600px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -562,7 +654,6 @@
       <div class="page-heading-row">
         <div>
           <div class="page-heading">the blog</div>
-          <div class="page-subheading">updates on whatever i'm working on</div>
         </div>
         <button class="new-post-btn" id="new-post-btn" disabled title="log in as owner to post">+ new post</button>
       </div>
@@ -740,26 +831,27 @@
 
     <div class="page" id="page-contact">
       <div><div class="page-heading">contact</div></div>
-      <div class="post">
-        <div class="post-body" style="padding:16px;">
-          <p>want to collab on an animation, an object show, or a flash project? find me here:</p>
-          <ul class="link-list" style="margin-top:10px;">
-            <li>
-              <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg></span>
-              <div>
-                <a href="https://www.youtube.com/@PatSplat29" target="_blank">YouTube &middot; @PatSplat29</a>
-                <span class="desc">object oddballs eps + more</span>
-              </div>
-            </li>
-            <li>
-              <span class="link-icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span>
-              <div>
-                <a href="https://flashdojo.com/user/PatSplat29" target="_blank">FlashDojo &middot; PatSplat29</a>
-                <span class="desc">flash games + animations</span>
-              </div>
-            </li>
-          </ul>
-        </div>
+
+      <div class="contact-intro">want to collab on an animation, an object show, or a flash project? hit me up below!</div>
+
+      <div class="contact-grid">
+        <a href="mailto:patsplat29@gmail.com" class="contact-card contact-card-email">
+          <div class="contact-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="contact-card-title">Email</div>
+          <div class="contact-card-value">patsplat29@gmail.com</div>
+          <div class="contact-card-desc">best for collab requests &amp; business stuff</div>
+        </a>
+
+        <a href="https://discord.gg/yA6EDbp5eh" target="_blank" class="contact-card contact-card-discord">
+          <div class="contact-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M20.32 4.37a18.6 18.6 0 0 0-4.6-1.43l-.23.42c1.62.4 3.1 1 4.44 1.82a15.7 15.7 0 0 0-12.04 0 12 12 0 0 0-.46-.42c-1.6.27-3.14.74-4.6 1.43C.4 9.18-.24 14 .07 18.74a18.9 18.9 0 0 0 5.69 2.87c.46-.63.87-1.3 1.22-2-.67-.25-1.3-.56-1.9-.93.16-.12.32-.24.46-.37a13.4 13.4 0 0 0 11.92 0c.15.13.3.25.46.37-.6.37-1.24.68-1.9.93.35.7.76 1.37 1.22 2a18.9 18.9 0 0 0 5.69-2.87c.37-5.52-.7-10.3-2.61-14.37zM8.02 15.33c-.97 0-1.76-.9-1.76-2s.78-2 1.76-2 1.78.9 1.76 2c0 1.1-.78 2-1.76 2zm7.96 0c-.97 0-1.76-.9-1.76-2s.78-2 1.76-2 1.78.9 1.76 2c0 1.1-.78 2-1.76 2z"/></svg>
+          </div>
+          <div class="contact-card-title">Discord</div>
+          <div class="contact-card-value">Join the server</div>
+          <div class="contact-card-desc">come hang out, chat, and see WIPs first</div>
+        </a>
       </div>
     </div>
 
@@ -872,7 +964,7 @@
 </div>
 
 <script>
-  const OWNER_PASSPHRASE = "patsplat29";
+  const OWNER_PASSPHRASE = "nicklpds1mpl@p(*)";
   let isOwner = false;
   let posts = [];
   let editingId = null;
