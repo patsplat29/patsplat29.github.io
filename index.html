@@ -964,8 +964,13 @@
 </div>
 
 <script>
-  const OWNER_PASSPHRASE = "nicklpds1mpl@p(*)";
+  // NOTE: passphrase is no longer stored anywhere in this file.
+  // It's checked server-side by the Cloudflare Pages Function at /api/login
+  // and posts are read/written via /api/posts, which checks the passphrase
+  // again on every write. See README-CLOUDFLARE-SETUP.md for setup steps.
+
   let isOwner = false;
+  let ownerPassphrase = ""; // kept only in memory for this tab's session, never persisted
   let posts = [];
   let editingId = null;
 
@@ -983,21 +988,15 @@
   async function loadPosts() {
     document.getElementById('blog-loading').style.display = 'block';
     try {
-      const result = await window.storage.get('patsplat-blog-posts', false);
-      posts = (result && result.value) ? JSON.parse(result.value) : [];
+      const res = await fetch('/api/posts');
+      const data = await res.json();
+      posts = data.posts || [];
     } catch (e) {
       posts = [];
+      console.error('failed to load posts', e);
     }
     document.getElementById('blog-loading').style.display = 'none';
     renderPosts();
-  }
-
-  async function savePosts() {
-    try {
-      await window.storage.set('patsplat-blog-posts', JSON.stringify(posts), false);
-    } catch (e) {
-      console.error('failed to save posts', e);
-    }
   }
 
   function renderPosts() {
@@ -1098,27 +1097,45 @@
 
     const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
 
-    if (editingId) {
-      const post = posts.find(p => p.id === editingId);
-      post.title = title; post.category = category; post.tags = tags; post.body = body;
-    } else {
-      posts.push({
-        id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-        title, category, tags, body, createdAt: Date.now()
-      });
+    try {
+      if (editingId) {
+        const res = await fetch('/api/posts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passphrase: ownerPassphrase, id: editingId, title, category, tags, postBody: body }),
+        });
+        if (!res.ok) throw new Error('save failed');
+      } else {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passphrase: ownerPassphrase, title, category, tags, postBody: body }),
+        });
+        if (!res.ok) throw new Error('save failed');
+      }
+      await loadPosts();
+      closeEditor();
+    } catch (e) {
+      alert("couldn't save the post — check your connection and try again.");
+      console.error(e);
     }
-
-    await savePosts();
-    renderPosts();
-    closeEditor();
   }
 
-  function deletePost(id) {
+  async function deletePost(id) {
     if (!isOwner) return;
     if (!confirm('delete this post? this cant be undone!')) return;
-    posts = posts.filter(p => p.id !== id);
-    savePosts();
-    renderPosts();
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: ownerPassphrase, id }),
+      });
+      if (!res.ok) throw new Error('delete failed');
+      await loadPosts();
+    } catch (e) {
+      alert("couldn't delete the post — check your connection and try again.");
+      console.error(e);
+    }
   }
 
   function setOwnerState(unlocked) {
@@ -1135,6 +1152,7 @@
       toggle.classList.remove('unlocked');
       newPostBtn.disabled = true;
       newPostBtn.title = 'log in as owner to post';
+      ownerPassphrase = '';
     }
     renderPosts();
   }
@@ -1158,14 +1176,29 @@
   document.getElementById('login-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'login-overlay') closeLogin();
   });
-  document.getElementById('login-submit-btn').addEventListener('click', () => {
+  document.getElementById('login-submit-btn').addEventListener('click', async () => {
     const val = document.getElementById('input-passphrase').value;
-    if (val === OWNER_PASSPHRASE) {
-      setOwnerState(true);
-      closeLogin();
-    } else {
+    const submitBtn = document.getElementById('login-submit-btn');
+    submitBtn.disabled = true;
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: val }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        ownerPassphrase = val;
+        setOwnerState(true);
+        closeLogin();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    } catch (e) {
+      document.getElementById('login-error').textContent = "couldn't reach the server, try again";
       document.getElementById('login-error').style.display = 'block';
     }
+    submitBtn.disabled = false;
   });
   document.getElementById('input-passphrase').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('login-submit-btn').click();
