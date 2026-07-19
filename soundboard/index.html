@@ -1,1 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PatSplat's Soundboard</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
 
+  body {
+    background: #ffe8c2;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 2px, transparent 2px, transparent 14px);
+    font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
+    font-size: 13px;
+    color: #4a3a2a;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #a86a3a;
+    text-decoration: none;
+    margin-bottom: 10px;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .back-link svg { width: 12px; height: 12px; fill: currentColor; }
+
+  .banner {
+    background: linear-gradient(135deg, #ff9ecb 0%, #ffc97a 50%, #8ed8ff 100%);
+    border: 4px solid #fff;
+    outline: 3px dashed #ff6fa5;
+    outline-offset: -10px;
+    padding: 18px 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-title {
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 3px 3px 0 #ff6fa5, -1px -1px 0 #c44a82;
+    letter-spacing: -1px;
+    display: inline-block;
+  }
+  .banner-sub {
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
+    font-size: 13px;
+    color: #5a3a1a;
+    font-weight: 700;
+    margin-top: 6px;
+    background: rgba(255,255,255,0.55);
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  .stop-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff5e0;
+    border: 2px solid #ffb366;
+    color: #8a4a1a;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+  }
+  .stop-all-btn:hover { background: #ffe0a0; }
+  .stop-all-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+  .board {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .sound-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fffdf7;
+    border: 3px solid var(--accent, #8ed8ff);
+    border-radius: 10px;
+    box-shadow: 3px 3px 0 var(--accent-shadow, rgba(142,216,255,0.35));
+    padding: 14px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .sound-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0 var(--accent-shadow, rgba(142,216,255,0.45));
+  }
+  .sound-btn:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 0 var(--accent-shadow, rgba(142,216,255,0.45));
+  }
+  .sound-btn.playing {
+    animation: pulseGlow 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes pulseGlow {
+    from { box-shadow: 3px 3px 0 var(--accent-shadow, rgba(142,216,255,0.35)); }
+    to { box-shadow: 3px 3px 14px 2px var(--accent-shadow, rgba(142,216,255,0.7)); }
+  }
+
+  .sound-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--accent, #8ed8ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+  .sound-icon svg { width: 20px; height: 20px; fill: currentColor; }
+  .sound-icon .icon-pause { display: none; }
+  .sound-btn.playing .sound-icon .icon-play { display: none; }
+  .sound-btn.playing .sound-icon .icon-pause { display: block; }
+
+  .sound-info { flex: 1; min-width: 0; }
+  .sound-title {
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #4a3a2a;
+  }
+  .sound-desc {
+    font-size: 10.5px;
+    color: #a88860;
+    margin-top: 2px;
+  }
+
+  .site-footer {
+    max-width: 720px;
+    margin: 20px auto 0;
+    text-align: center;
+    color: #a88860;
+    font-size: 10px;
+  }
+  .site-footer a { color: #ff6fa5; text-decoration: none; font-weight: bold; }
+  .site-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <a class="back-link" href="/">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
+    back to patsplat.com
+  </a>
+
+  <div class="banner">
+    <div class="banner-title">soundboard!</div>
+    <br>
+    <span class="banner-sub">click a button, hear a sound :)</span>
+  </div>
+
+  <div class="toolbar">
+    <button class="stop-all-btn" id="stop-all-btn">
+      <svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+      stop all sounds
+    </button>
+  </div>
+
+  <div class="board" id="board">
+
+    <button class="sound-btn" data-src="windows-xp-startup.mp3" style="--accent:#8ed8ff; --accent-shadow:rgba(142,216,255,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">XP Startup</span>
+        <span class="sound-desc">the classic login chime</span>
+      </span>
+    </button>
+
+    <button class="sound-btn" data-src="windows_xp_shutdown.mp3" style="--accent:#b0a4ff; --accent-shadow:rgba(176,164,255,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">XP Shutdown</span>
+        <span class="sound-desc">time to power down</span>
+      </span>
+    </button>
+
+    <button class="sound-btn" data-src="windows_xp_tada.mp3" style="--accent:#ff9ecb; --accent-shadow:rgba(255,158,203,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">Ta-da!</span>
+        <span class="sound-desc">the good news jingle</span>
+      </span>
+    </button>
+
+    <button class="sound-btn" data-src="windows_xp_error.mp3" style="--accent:#ff8a8a; --accent-shadow:rgba(255,138,138,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">Error</span>
+        <span class="sound-desc">uh oh, something broke</span>
+      </span>
+    </button>
+
+    <button class="sound-btn" data-src="windows_xp_greenscreen.mp3" style="--accent:#5ec97a; --accent-shadow:rgba(94,201,122,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">Green Screen</span>
+        <span class="sound-desc">critical process died</span>
+      </span>
+    </button>
+
+    <button class="sound-btn" data-src="windows-95.mp3" style="--accent:#ffb366; --accent-shadow:rgba(255,179,102,0.4);">
+      <span class="sound-icon">
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </span>
+      <span class="sound-info">
+        <span class="sound-title">Windows 95</span>
+        <span class="sound-desc">where it all began</span>
+      </span>
+    </button>
+
+  </div>
+
+</div>
+
+<div class="site-footer">
+  PatSplat &middot; <a href="/">back to home</a>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.sound-btn');
+
+  buttons.forEach(btn => {
+    const audio = new Audio(btn.dataset.src);
+    audio.preload = 'auto';
+    btn._audio = audio;
+
+    btn.addEventListener('click', () => {
+      if (!audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+        btn.classList.remove('playing');
+        return;
+      }
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+      btn.classList.add('playing');
+    });
+
+    audio.addEventListener('ended', () => {
+      btn.classList.remove('playing');
+    });
+  });
+
+  document.getElementById('stop-all-btn').addEventListener('click', () => {
+    buttons.forEach(btn => {
+      btn._audio.pause();
+      btn._audio.currentTime = 0;
+      btn.classList.remove('playing');
+    });
+  });
+</script>
+
+</body>
+</html>
