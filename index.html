@@ -9,8 +9,11 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <title>PatSplat's Site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Trebuchet+MS&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
@@ -25,7 +28,7 @@
   .banner {
     max-width: 940px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #ff9ecb 0%, #ffc97a 50%, #8ed8ff 100%);
+    background: #241a3a;
     border: 4px solid #fff;
     outline: 3px dashed #ff6fa5;
     outline-offset: -10px;
@@ -33,18 +36,44 @@
     position: relative;
     overflow: hidden;
   }
+  .banner-swf-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .banner-swf-bg embed {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   .banner-title {
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 42px;
     font-weight: 700;
     color: #fff;
     text-shadow: 3px 3px 0 #ff6fa5, -1px -1px 0 #c44a82;
     letter-spacing: -1px;
-    transform: rotate(-2deg);
     display: inline-block;
+    cursor: pointer;
+    animation: titleWiggle 3s ease-in-out infinite;
+    transform-origin: center center;
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes titleWiggle {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(3deg) translateY(-2px); }
+  }
+  .banner-title.spinning {
+    animation: titleSpin 0.6s ease-in-out;
+  }
+  @keyframes titleSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
   .banner-sub {
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 14px;
     color: #5a3a1a;
     font-weight: 700;
@@ -53,6 +82,8 @@
     display: inline-block;
     padding: 2px 10px;
     border-radius: 10px;
+    position: relative;
+    z-index: 1;
   }
   .banner-stars {
     position: absolute;
@@ -60,8 +91,9 @@
     font-size: 11px;
     color: #fff;
     text-shadow: 1px 1px 0 #c44a82;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-weight: 700;
+    z-index: 1;
   }
   .owner-toggle {
     position: absolute;
@@ -73,6 +105,7 @@
     font-size: 10px;
     font-weight: bold;
     color: #5a3a1a;
+    z-index: 1;
     cursor: pointer;
     font-family: inherit;
   }
@@ -125,7 +158,7 @@
     gap: 10px;
   }
   .page-heading {
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 24px;
     color: #d6478a;
     font-weight: 700;
@@ -174,7 +207,7 @@
     gap: 8px;
   }
   .post-title {
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 21px;
     color: #d6478a;
     font-weight: 700;
@@ -246,15 +279,22 @@
     border-radius: 8px;
     box-shadow: 3px 3px 0 rgba(142,216,255,0.35);
     overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .work-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 5px 5px 0 rgba(142,216,255,0.45);
   }
   .work-thumb {
-    height: 130px;
+    aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, #2a2a4a, #1a1a2a);
     border-bottom: 3px solid #8ed8ff;
     display: block;
     position: relative;
+    overflow: hidden;
   }
-  .work-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s; }
+  .work-card:hover .work-thumb img { transform: scale(1.04); }
   .work-thumb-badge {
     position: absolute;
     top: 6px; left: 6px;
@@ -280,7 +320,7 @@
     color: #ff6fa5;
   }
   .work-info { padding: 10px 12px; }
-  .work-title { font-family: 'Comic Neue', cursive; font-size: 16px; color: #2a6a9a; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .work-title { font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; font-size: 16px; color: #2a6a9a; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
   .work-title a { color: inherit; text-decoration: none; }
   .work-title a:hover { text-decoration: underline; }
   .work-desc { font-size: 11px; color: #5a4530; line-height: 1.5; margin-bottom: 6px; }
@@ -299,7 +339,6 @@
   }
   .work-link:hover { background: #6ab0ff; }
   .work-card.full { grid-column: span 2; }
-  .work-card.full .work-thumb { height: 220px; }
 
   .side { display: flex; flex-direction: column; gap: 12px; }
   .side-box {
@@ -311,7 +350,7 @@
   .side-box-title {
     background: linear-gradient(135deg, #8ed8ff 0%, #b0a4ff 100%);
     color: #fff;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 14px;
     font-weight: 700;
     padding: 7px 12px;
@@ -330,11 +369,11 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 26px;
     font-weight: 700;
   }
-  .profile-name { text-align: center; font-weight: 700; color: #d6478a; font-size: 14px; margin-bottom: 2px; font-family: 'Comic Neue', cursive; }
+  .profile-name { text-align: center; font-weight: 700; color: #d6478a; font-size: 14px; margin-bottom: 2px; font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; }
   .profile-tag { text-align: center; font-size: 10px; color: #a88860; margin-bottom: 8px; }
 
   .link-list { list-style: none; }
@@ -404,12 +443,12 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 22px;
     font-weight: 700;
     flex-shrink: 0;
   }
-  .about-name { font-family: 'Comic Neue', cursive; font-size: 20px; color: #d6478a; font-weight: 700; }
+  .about-name { font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; font-size: 20px; color: #d6478a; font-weight: 700; }
   .about-role { font-size: 11px; color: #a88860; margin-top: 2px; }
 
   .about-facts {
@@ -471,7 +510,7 @@
     background: linear-gradient(135deg, #ffe0a0 0%, #ffcfe0 100%);
     border-bottom: 2px dashed #ffb366;
     padding: 12px 16px;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 18px;
     color: #d6478a;
     font-weight: 700;
@@ -600,7 +639,7 @@
   .contact-card-discord .contact-card-icon { color: #6a78e8; }
   .contact-card-icon .icon { width: 28px; height: 28px; }
   .contact-card-title {
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #fff;
@@ -637,8 +676,11 @@
 <body>
 
 <div class="banner">
+  <div class="banner-swf-bg">
+    <embed src="DonutHoleBanner.swf" type="application/x-shockwave-flash" width="100%" height="100%" scale="noborder" quality="high">
+  </div>
   <div class="banner-stars">* ~ welcome to my corner of the internet ~ *</div>
-  <div class="banner-title">PatSplat's Site!</div>
+  <div class="banner-title" id="banner-title">PatSplat's Site!</div>
   <br>
   <span class="banner-sub">animation, flash games, and random rambles :)</span>
   <button class="owner-toggle" id="owner-toggle">owner login</button>
@@ -679,7 +721,7 @@
       <div class="work-grid">
 
         <div class="work-card full">
-          <a href="https://www.youtube.com/watch?v=-to_1mVVjZg" target="_blank" class="work-thumb">
+          <a href="https://www.youtube.com/watch?v=qk2sv36LorU" target="_blank" class="work-thumb">
             <span class="work-thumb-badge">
               <svg class="icon" viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.8-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5c-1 .2-1.8 1-2 2C2 9 2 12 2 12s0 3 .4 4.8c.2 1 1 1.8 2 2 1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5c1-.2 1.8-1 2-2C22 15 22 12 22 12s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
               Object Oddballs
@@ -687,7 +729,7 @@
             <div class="work-icon-circle">
               <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <img src="https://www.youtube.com/watch?v=qk2sv36LorU/maxresdefault.jpg" alt="OO 5: Let's Play Catch!" onerror="this.src='https://img.youtube.com/vi/-to_1mVVjZg/hqdefault.jpg'">
+            <img src="https://img.youtube.com/vi/qk2sv36LorU/maxresdefault.jpg" alt="OO 5: Let's Play Catch!" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/qk2sv36LorU/hqdefault.jpg'">
           </a>
           <div class="work-info">
             <div class="work-title">
@@ -1211,6 +1253,15 @@
   document.getElementById('save-btn').addEventListener('click', handleSave);
   document.getElementById('modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'modal-overlay') closeEditor();
+  });
+
+  document.getElementById('banner-title').addEventListener('click', function() {
+    this.classList.remove('spinning');
+    void this.offsetWidth; // restart animation if clicked again mid-spin
+    this.classList.add('spinning');
+  });
+  document.getElementById('banner-title').addEventListener('animationend', function(e) {
+    if (e.animationName === 'titleSpin') this.classList.remove('spinning');
   });
 
   function showPage(name) {
